@@ -484,46 +484,72 @@
 
   /* ── CUSTOM POLYGON TOOLTIP ── */
   .polygon-tooltip {
-    background: rgba(15, 17, 23, 0.95);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255, 255, 255, 0.15);
-    border-radius: var(--radius-sm);
-    padding: 12px 14px;
+    background: rgba(12, 14, 20, 0.94);
+    backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    border-radius: 8px;
+    padding: 10px 12px;
     color: var(--text-primary);
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
-    width: 220px;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.42), 0 1px 0 rgba(255,255,255,0.08) inset;
+    width: 210px;
     font-size: 13px;
-    line-height: 1.5;
+    line-height: 1.4;
     pointer-events: none;
     position: absolute;
     z-index: 200;
     opacity: 0;
     display: none;
-    transition: opacity 0.15s ease;
+    transform: translate(-50%, calc(-100% - 14px));
+    transition: opacity 0.15s ease, transform 0.15s ease;
+  }
+  .polygon-tooltip.below {
+    transform: translate(-50%, 14px);
+  }
+  .polygon-tooltip::after {
+    content: '';
+    position: absolute;
+    left: 50%;
+    bottom: -6px;
+    width: 10px;
+    height: 10px;
+    background: rgba(12, 14, 20, 0.94);
+    border-right: 1px solid rgba(255,255,255,0.18);
+    border-bottom: 1px solid rgba(255,255,255,0.18);
+    transform: translateX(-50%) rotate(45deg);
+  }
+  .polygon-tooltip.below::after {
+    top: -6px;
+    bottom: auto;
+    border-right: 0;
+    border-bottom: 0;
+    border-left: 1px solid rgba(255,255,255,0.18);
+    border-top: 1px solid rgba(255,255,255,0.18);
   }
   .polygon-tooltip-title {
     font-weight: 700;
-    font-size: 14px;
-    margin-bottom: 6px;
+    font-size: 13px;
+    margin-bottom: 7px;
     border-bottom: 1px solid var(--border);
-    padding-bottom: 4px;
+    padding-bottom: 6px;
     color: var(--text-primary);
   }
   .polygon-tooltip-row {
     display: flex;
     justify-content: space-between;
+    gap: 10px;
     font-size: 12px;
     color: var(--text-secondary);
-    margin-bottom: 4px;
+    margin-bottom: 5px;
   }
   .polygon-tooltip-row strong {
     color: var(--text-primary);
     font-weight: 600;
+    text-align: right;
   }
   .polygon-tooltip-status {
     display: inline-flex;
-    margin-top: 6px;
-    padding: 2px 8px;
+    margin-top: 5px;
+    padding: 3px 8px;
     border-radius: 10px;
     font-size: 11px;
     font-weight: 600;
@@ -1134,15 +1160,24 @@ function setPolygonTooltipContent(tooltip, lot) {
 function positionPolygonTooltip(tooltip, points, width, height) {
   if (!points.length) return;
 
-  const anchorX = points.reduce((sum, point) => sum + point.x, 0) / points.length;
-  const anchorY = Math.min(...points.map(point => point.y)) - 12;
-  const tooltipWidth = tooltip.offsetWidth || 220;
+  const minX = Math.min(...points.map(point => point.x));
+  const maxX = Math.max(...points.map(point => point.x));
+  const minY = Math.min(...points.map(point => point.y));
+  const maxY = Math.max(...points.map(point => point.y));
+  const centerX = (minX + maxX) / 2;
+  const centerY = (minY + maxY) / 2;
+  const tooltipWidth = tooltip.offsetWidth || 210;
   const tooltipHeight = tooltip.offsetHeight || 90;
-  const clampedX = Math.max(tooltipWidth / 2 + 8, Math.min(width - tooltipWidth / 2 - 8, anchorX));
-  const clampedY = Math.max(tooltipHeight + 8, Math.min(height - 8, anchorY));
+  const margin = 10;
+  const clampedX = Math.max(tooltipWidth / 2 + margin, Math.min(width - tooltipWidth / 2 - margin, centerX));
+  const canFitAbove = centerY - tooltipHeight - 24 >= margin;
+  const clampedY = canFitAbove
+    ? Math.max(tooltipHeight + 18 + margin, Math.min(height - margin, centerY))
+    : Math.max(margin, Math.min(height - tooltipHeight - 24 - margin, centerY));
 
   tooltip.style.left = `${clampedX}px`;
   tooltip.style.top = `${clampedY}px`;
+  tooltip.classList.toggle('below', !canFitAbove);
 }
 
 function showPolygonTooltip(lot, points, width, height) {
