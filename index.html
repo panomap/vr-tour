@@ -402,6 +402,38 @@
     font-weight: 600;
   }
 
+  /* ── MAP BUTTON ── */
+  .map-button {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    border: 1px solid rgba(255,255,255,0.18);
+    background: rgba(15,17,23,0.86);
+    color: var(--text-primary);
+    box-shadow: 0 12px 28px rgba(0,0,0,0.36);
+    backdrop-filter: blur(12px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 90;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .map-button:hover,
+  .map-button:focus {
+    background: rgba(26,115,232,0.95);
+    border-color: rgba(255,255,255,0.32);
+    transform: translateY(-2px);
+    outline: none;
+  }
+  .map-button svg {
+    width: 20px;
+    height: 20px;
+  }
+
   /* ── LOADING ── */
   .loading-screen {
     position: absolute; inset: 0;
@@ -466,6 +498,7 @@
     .topbar-title { display: none; }
     .counter-badge { top: 12px; right: 12px; }
     .coords-badge { top: 48px; right: 12px; }
+    .map-button { right: 12px; bottom: 12px; }
     .info-overlay { bottom: 16px; left: 16px; right: 16px; transform: none; }
   }
 
@@ -829,6 +862,14 @@
       <span id="coordsText">Yaw: <span id="coordsYaw">—</span>° | Pitch: <span id="coordsPitch">—</span>°</span>
     </div>
 
+    <!-- Map -->
+    <button class="map-button" id="mapButton" type="button" title="Открыть на Google Карте" aria-label="Открыть место на Google Карте">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 21s7-5.1 7-11a7 7 0 1 0-14 0c0 5.9 7 11 7 11z"/>
+        <circle cx="12" cy="10" r="2.4"/>
+      </svg>
+    </button>
+
     <!-- Custom Polygon Tooltip -->
     <div class="polygon-tooltip" id="polygonTooltip"></div>
 
@@ -887,6 +928,7 @@ const COL = {
   lotText:     'lot_text',      // короткое описание участка
   lotLink:     'lot_link',      // ссылка на объявление или контакты
   lotPoints:   'lot_points',    // границы участка: yaw,pitch; yaw,pitch; yaw,pitch
+  mapUrl:      'map_url',       // ссылка на Google Maps для сцены или объекта
 };
 
 // ════════════════════════════════════════════════════
@@ -1478,6 +1520,21 @@ function updateOverlay(sceneId) {
   document.getElementById('infoTitle').textContent = row[COL.title] || sceneId;
   document.getElementById('infoDesc').textContent = row[COL.description] || '';
   document.getElementById('topbarTitle').textContent = row[COL.title] || sceneId;
+  updateMapButton(row);
+}
+
+function mapUrlFromRow(row) {
+  const directUrl = (row?.[COL.mapUrl] || '').trim();
+  if (directUrl) return directUrl;
+
+  const query = row?.[COL.title] || row?.[COL.description] || 'EXPO Astana';
+  return `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query)}`;
+}
+
+function updateMapButton(row) {
+  const btn = document.getElementById('mapButton');
+  if (!btn) return;
+  btn.dataset.mapUrl = mapUrlFromRow(row);
 }
 
 // Инициализация viewer
@@ -1523,6 +1580,12 @@ document.getElementById('btnFullscreen').addEventListener('click', () => {
 // Мобильный toggle сайдбара
 document.getElementById('sidebarToggle').addEventListener('click', () => {
   document.getElementById('sidebar').classList.toggle('open');
+});
+
+document.getElementById('mapButton').addEventListener('click', () => {
+  const row = allScenes.find(scene => scene[COL.id] === currentSceneId);
+  const url = document.getElementById('mapButton').dataset.mapUrl || mapUrlFromRow(row);
+  window.open(url, '_blank', 'noopener');
 });
 
 // Координаты под курсором мыши
@@ -1784,14 +1847,14 @@ if (viewerWrap) {
 
   viewerWrap.addEventListener('mousedown', (e) => {
     if (e.button !== 0) return;
-    if (e.target.closest('#editorPanel') || e.target.closest('.coords-badge') || e.target.closest('.counter-badge') || e.target.closest('.info-overlay') || e.target.closest('.topbar') || e.target.closest('.sidebar')) return;
+    if (e.target.closest('#editorPanel') || e.target.closest('.map-button') || e.target.closest('.coords-badge') || e.target.closest('.counter-badge') || e.target.closest('.info-overlay') || e.target.closest('.topbar') || e.target.closest('.sidebar')) return;
     clickStartPos = { x: e.clientX, y: e.clientY };
   });
 
   viewerWrap.addEventListener('mouseup', (e) => {
     if (!isDrawingMode || !viewer) return;
     if (e.button !== 0) return;
-    if (e.target.closest('#editorPanel') || e.target.closest('.coords-badge') || e.target.closest('.counter-badge') || e.target.closest('.info-overlay') || e.target.closest('.topbar') || e.target.closest('.sidebar')) return;
+    if (e.target.closest('#editorPanel') || e.target.closest('.map-button') || e.target.closest('.coords-badge') || e.target.closest('.counter-badge') || e.target.closest('.info-overlay') || e.target.closest('.topbar') || e.target.closest('.sidebar')) return;
     
     const dx = e.clientX - clickStartPos.x;
     const dy = e.clientY - clickStartPos.y;
