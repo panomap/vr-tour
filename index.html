@@ -1900,7 +1900,7 @@ function scheduleHidePolygonTooltip() {
   polygonTooltipHideTimer = setTimeout(() => {
     polygonTooltipHideTimer = null;
     hidePolygonTooltip();
-  }, 160);
+  }, 90);
 }
 
 function renderLotPolygons() {
@@ -2613,11 +2613,18 @@ if (viewerWrap) {
 
     polygonTooltipElement.addEventListener('mouseleave', () => {
       isPolygonTooltipHovered = false;
-      scheduleHidePolygonTooltip();
+      hidePolygonTooltip(true);
     });
   }
 
   viewerWrap.addEventListener('mousemove', (e) => {
+    if (e.target.closest('#polygonTooltip')) {
+      isPolygonTooltipHovered = true;
+      lastPolygonPointer.inside = false;
+      return;
+    }
+
+    isPolygonTooltipHovered = false;
     const rect = viewerWrap.getBoundingClientRect();
     lastPolygonPointer = {
       x: e.clientX - rect.left,
