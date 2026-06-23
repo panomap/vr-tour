@@ -1912,6 +1912,18 @@ function keepPolygonTooltipOpen() {
   }
 }
 
+function lotUnderScreenPoint(point, width, height) {
+  const lots = (lotPolygonsByScene[currentSceneId] || []).filter(visibleLot);
+  for (const lot of lots) {
+    const screenPoints = lot.points.map(lotPoint => projectPoint(lotPoint, width, height));
+    const validPoints = screenPoints.filter(Boolean);
+    if (validPoints.length >= 3 && isPointInPolygon(point, validPoints)) {
+      return { lot, points: validPoints };
+    }
+  }
+  return null;
+}
+
 function renderLotPolygons() {
   if (!viewer || !currentSceneId) return;
   const layer = document.getElementById('lotPolygonLayer');
@@ -1938,14 +1950,6 @@ function renderLotPolygons() {
     polygon.setAttribute('tabindex', '0');
     polygon.setAttribute('role', 'button');
     polygon.setAttribute('aria-label', `${lot.title}. ${status.label}`);
-    polygon.addEventListener('mouseenter', () => {
-      isLotPolygonHovered = true;
-      keepPolygonTooltipOpen();
-    });
-    polygon.addEventListener('mouseleave', () => {
-      isLotPolygonHovered = false;
-      scheduleHidePolygonTooltip();
-    });
 
     if (lastPolygonPointer.inside && isPointInPolygon(lastPolygonPointer, validPoints)) {
       polygon.classList.add('is-hovered');
@@ -2624,6 +2628,7 @@ if (viewerWrap) {
   if (polygonTooltipElement) {
     polygonTooltipElement.addEventListener('mouseenter', () => {
       isPolygonTooltipHovered = true;
+      isLotPolygonHovered = false;
       keepPolygonTooltipOpen();
     });
 
@@ -2636,22 +2641,29 @@ if (viewerWrap) {
   viewerWrap.addEventListener('mousemove', (e) => {
     if (e.target.closest('#polygonTooltip')) {
       isPolygonTooltipHovered = true;
+      isLotPolygonHovered = false;
       lastPolygonPointer.inside = false;
       keepPolygonTooltipOpen();
       return;
     }
 
     isPolygonTooltipHovered = false;
-    if (e.target.closest('.lot-polygon')) {
-      isLotPolygonHovered = true;
-      keepPolygonTooltipOpen();
-    }
     const rect = viewerWrap.getBoundingClientRect();
-    lastPolygonPointer = {
+    const point = {
       x: e.clientX - rect.left,
       y: e.clientY - rect.top,
+    };
+    lastPolygonPointer = {
+      ...point,
       inside: true,
     };
+    const hovered = lotUnderScreenPoint(point, rect.width, rect.height);
+    isLotPolygonHovered = Boolean(hovered);
+    if (hovered) {
+      keepPolygonTooltipOpen();
+    } else if (activePolygonTooltipKey) {
+      scheduleHidePolygonTooltip();
+    }
   });
 
   viewerWrap.addEventListener('mouseleave', () => {
