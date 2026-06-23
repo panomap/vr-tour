@@ -11,64 +11,118 @@
 
   :root {
     --sidebar-w: 300px;
-    --topbar-h: 56px;
-    --accent: #1a73e8;
-    --accent-hover: #1557b0;
-    --bg-dark: #0f1117;
-    --bg-panel: #1a1d27;
-    --bg-card: #22263a;
-    --bg-card-hover: #2a2f47;
-    --text-primary: #f0f2ff;
-    --text-secondary: #8b93b8;
-    --text-muted: #555d82;
-    --border: rgba(255,255,255,0.07);
-    --border-hover: rgba(255,255,255,0.15);
-    --radius: 10px;
-    --radius-sm: 6px;
+    --topbar-h: 72px;
+    --brand-green: #518746;
+    --brand-green-deep: #213a21;
+    --brand-cream: #f7f4ec;
+    --accent: #518746;
+    --accent-hover: #6baa5f;
+    --bg-dark: #102316;
+    --bg-panel: rgba(255,255,255,0.92);
+    --bg-card: rgba(255,255,255,0.76);
+    --bg-card-hover: rgba(81,135,70,0.10);
+    --text-primary: #213a21;
+    --text-secondary: #4d6049;
+    --text-muted: #7b8777;
+    --border: rgba(33,58,33,0.14);
+    --border-hover: rgba(33,58,33,0.28);
+    --radius: 22px;
+    --radius-sm: 14px;
   }
 
   body {
-    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-family: Montserrat, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     background: var(--bg-dark);
     color: var(--text-primary);
     height: 100vh;
     overflow: hidden;
-    display: flex;
-    flex-direction: column;
   }
 
   /* ── TOP BAR ── */
   .topbar {
+    position: fixed;
+    top: 18px;
+    left: 18px;
+    right: 18px;
     height: var(--topbar-h);
-    background: var(--bg-panel);
-    border-bottom: 1px solid var(--border);
+    background:
+      linear-gradient(90deg, rgba(255,255,255,0.96), rgba(255,255,255,0.84));
+    border: 1px solid rgba(33,58,33,0.14);
+    border-radius: 30px;
+    backdrop-filter: blur(12px);
     display: flex;
     align-items: center;
-    padding: 0 16px;
-    gap: 12px;
+    padding: 0 18px;
+    gap: 16px;
     z-index: 100;
     flex-shrink: 0;
+    box-shadow: 0 18px 46px rgba(16,35,22,0.22);
   }
   .topbar-logo {
-    font-size: 15px;
-    font-weight: 600;
-    color: var(--text-primary);
-    letter-spacing: -0.3px;
+    min-width: 0;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--brand-green-deep);
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 12px;
   }
-  .topbar-logo svg { color: var(--accent); }
+  .brand-logo-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: inherit;
+    text-decoration: none;
+    min-width: 0;
+  }
+  .brand-logo-link:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+    border-radius: 18px;
+  }
+  .brand-logo-img {
+    width: 118px;
+    height: 58px;
+    object-fit: contain;
+    object-position: center;
+    display: block;
+    border-radius: 0;
+    background: transparent;
+  }
+  .brand-kicker {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 84px;
+  }
+  .brand-kicker span:last-child {
+    color: var(--text-secondary);
+    font-size: 10px;
+    letter-spacing: 0.12em;
+  }
   .topbar-title {
     font-size: 14px;
     color: var(--text-secondary);
-    border-left: 1px solid var(--border-hover);
+    border-left: 1px solid rgba(33,58,33,0.18);
     padding-left: 12px;
     margin-left: 4px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 300px;
+    text-transform: uppercase;
+  }
+  .topbar-title::before {
+    content: 'Локация';
+    display: block;
+    margin-bottom: 2px;
+    color: var(--text-muted);
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
   }
   .topbar-actions {
     margin-left: auto;
@@ -76,46 +130,117 @@
     align-items: center;
     gap: 8px;
   }
+  .btn-request {
+    min-height: 40px;
+    border: 1px solid var(--brand-green);
+    border-radius: 999px;
+    background: var(--brand-green);
+    color: white;
+    padding: 0 16px;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .btn-request:hover {
+    background: var(--accent-hover);
+    border-color: var(--accent-hover);
+    transform: translateY(-1px);
+  }
   .btn-icon {
-    width: 34px; height: 34px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    background: transparent;
-    color: var(--text-secondary);
+    width: 40px; height: 40px;
+    border: 1px solid var(--accent);
+    border-radius: 50%;
+    background: var(--accent);
+    color: white;
     cursor: pointer;
     display: flex; align-items: center; justify-content: center;
     transition: all 0.15s;
   }
-  .btn-icon:hover { background: var(--bg-card); color: var(--text-primary); border-color: var(--border-hover); }
-  .btn-sidebar-toggle { display: none; }
+  .btn-icon:hover { background: var(--accent-hover); color: white; border-color: var(--accent-hover); transform: translateY(-1px); }
+  .btn-sidebar-toggle { display: flex; }
+  .editor-only.is-hidden {
+    display: none !important;
+  }
+  body:not(.editor-mode) .coords-badge,
+  body:not(.editor-mode) .editor-panel {
+    display: none !important;
+  }
 
   /* ── LAYOUT ── */
   .layout {
-    display: flex;
-    flex: 1;
+    position: fixed;
+    inset: 0;
+    display: block;
     overflow: hidden;
   }
 
   /* ── SIDEBAR ── */
   .sidebar {
+    position: absolute;
+    top: 104px;
+    left: 18px;
+    bottom: 18px;
     width: var(--sidebar-w);
-    background: var(--bg-panel);
-    border-right: 1px solid var(--border);
+    max-height: calc(100vh - 122px);
+    background: rgba(255,255,255,0.92);
+    backdrop-filter: blur(16px);
+    border: 1px solid rgba(33,58,33,0.14);
+    border-radius: 28px;
     display: flex;
     flex-direction: column;
-    flex-shrink: 0;
     overflow: hidden;
-    transition: transform 0.25s ease;
+    transform: translateX(calc(-100% - 24px));
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    z-index: 90;
+    box-shadow: 0 22px 56px rgba(16,35,22,0.24);
+  }
+  .sidebar.open {
+    transform: translateX(0);
+  }
+  .sidebar-brand {
+    padding: 14px 14px 12px;
+    border-bottom: 1px solid rgba(33,58,33,0.10);
+    background: linear-gradient(180deg, rgba(81,135,70,0.10), rgba(81,135,70,0));
+  }
+  .sidebar-brand a {
+    display: block;
+    border-radius: 22px;
+  }
+  .sidebar-brand a:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 4px;
+  }
+  .sidebar-brand img {
+    width: 100%;
+    height: 86px;
+    object-fit: contain;
+    display: block;
+    border-radius: 22px;
+    background: var(--brand-cream);
+    padding: 8px;
+  }
+  .sidebar-brand-meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+    margin-top: 10px;
+    color: var(--brand-green-deep);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
   }
   .sidebar-search {
     padding: 12px;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid rgba(33,58,33,0.10);
     flex-shrink: 0;
   }
   .sidebar-search input {
     width: 100%;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
+    background: rgba(81,135,70,0.07);
+    border: 1px solid rgba(33,58,33,0.18);
     border-radius: var(--radius-sm);
     padding: 8px 12px 8px 34px;
     color: var(--text-primary);
@@ -132,6 +257,69 @@
     color: var(--text-muted);
     pointer-events: none;
   }
+  .lot-tools {
+    padding: 12px;
+    border-bottom: 1px solid rgba(33,58,33,0.10);
+    display: grid;
+    gap: 10px;
+  }
+  .lot-tools-title {
+    color: var(--brand-green-deep);
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.10em;
+    text-transform: uppercase;
+  }
+  .status-filter-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+  }
+  .status-filter {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid rgba(33,58,33,0.14);
+    border-radius: 999px;
+    background: rgba(255,255,255,0.72);
+    color: var(--text-secondary);
+    padding: 7px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+  .status-filter.is-active {
+    background: rgba(81,135,70,0.12);
+    border-color: rgba(81,135,70,0.38);
+    color: var(--brand-green-deep);
+  }
+  .status-dot {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: var(--brand-green);
+    vertical-align: middle;
+  }
+  .status-dot.reserved { background: #c99435; }
+  .status-dot.sold { background: #b86b5d; }
+  .lot-stats {
+    display: grid;
+    gap: 6px;
+    color: var(--text-secondary);
+    font-size: 12px;
+  }
+  .lot-stat {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .lot-stat strong {
+    color: var(--brand-green-deep);
+    font-weight: 800;
+  }
   .sidebar-list {
     flex: 1;
     overflow-y: auto;
@@ -145,7 +333,7 @@
     font-size: 10px;
     font-weight: 600;
     letter-spacing: 0.08em;
-    color: var(--text-muted);
+    color: rgba(245,244,239,0.58);
     text-transform: uppercase;
     padding: 12px 8px 6px;
   }
@@ -155,14 +343,14 @@
     align-items: center;
     gap: 10px;
     padding: 9px 10px;
-    border-radius: var(--radius-sm);
+    border-radius: 18px;
     cursor: pointer;
     border: 1px solid transparent;
     transition: all 0.15s;
     margin-bottom: 2px;
   }
-  .scene-card:hover { background: var(--bg-card-hover); border-color: var(--border); }
-  .scene-card.active { background: rgba(26,115,232,0.12); border-color: rgba(26,115,232,0.35); }
+  .scene-card:hover { background: rgba(81,135,70,0.10); border-color: rgba(81,135,70,0.22); }
+  .scene-card.active { background: rgba(81,135,70,0.14); border-color: rgba(81,135,70,0.42); }
   .scene-thumb {
     width: 52px; height: 36px;
     border-radius: 5px;
@@ -185,7 +373,7 @@
     color: var(--text-primary);
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-  .scene-card.active .scene-name { color: #6aabff; }
+  .scene-card.active .scene-name { color: var(--brand-green); }
   .scene-desc {
     font-size: 11px;
     color: var(--text-muted);
@@ -201,7 +389,8 @@
 
   /* ── VIEWER ── */
   .viewer-wrap {
-    flex: 1;
+    width: 100%;
+    height: 100%;
     position: relative;
     overflow: hidden;
   }
@@ -220,50 +409,50 @@
   .lot-polygon {
     pointer-events: auto;
     cursor: pointer;
-    stroke: #22c55e;
+    stroke: var(--brand-green);
     stroke-width: 3;
     vector-effect: non-scaling-stroke;
-    fill: rgba(34,197,94,0.03);
-    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.32));
+    fill: rgba(81,135,70,0.08);
+    filter: drop-shadow(0 4px 12px rgba(33,58,33,0.22));
     transition: fill 0.15s, stroke-width 0.15s, stroke-opacity 0.15s;
   }
   .lot-polygon.is-hovered,
   .lot-polygon:hover,
   .lot-polygon:focus {
-    fill: rgba(34,197,94,0.26);
+    fill: rgba(81,135,70,0.24);
     stroke-width: 4;
   }
-  .lot-polygon.lot-reserved { stroke: #f59e0b; fill: rgba(245,158,11,0.03); }
+  .lot-polygon.lot-reserved { stroke: #c99435; fill: rgba(201,148,53,0.08); }
   .lot-polygon.lot-reserved.is-hovered,
   .lot-polygon.lot-reserved:hover,
-  .lot-polygon.lot-reserved:focus { fill: rgba(245,158,11,0.28); }
-  .lot-polygon.lot-sold { stroke: #ef4444; fill: rgba(239,68,68,0.03); }
+  .lot-polygon.lot-reserved:focus { fill: rgba(201,148,53,0.24); }
+  .lot-polygon.lot-sold { stroke: #b86b5d; fill: rgba(184,107,93,0.08); }
   .lot-polygon.lot-sold.is-hovered,
   .lot-polygon.lot-sold:hover,
-  .lot-polygon.lot-sold:focus { fill: rgba(239,68,68,0.26); }
+  .lot-polygon.lot-sold:focus { fill: rgba(184,107,93,0.22); }
   .lot-number {
     pointer-events: none;
     paint-order: stroke;
-    stroke: rgba(15,17,23,0.92);
+    stroke: rgba(255,255,255,0.92);
     stroke-width: 5px;
     stroke-linejoin: round;
-    fill: #fff;
+    fill: var(--brand-green-deep);
     font-size: 18px;
     font-weight: 800;
     text-anchor: middle;
     dominant-baseline: central;
     filter: drop-shadow(0 3px 8px rgba(0,0,0,0.45));
   }
-  .lot-number.lot-available { fill: #86efac; }
-  .lot-number.lot-reserved { fill: #fcd34d; }
-  .lot-number.lot-sold { fill: #fca5a5; }
-  .lot-number.lot-draft { fill: #c4b5fd; }
+  .lot-number.lot-available { fill: var(--brand-green); }
+  .lot-number.lot-reserved { fill: #9b6b1f; }
+  .lot-number.lot-sold { fill: #9d4d42; }
+  .lot-number.lot-draft { fill: #4d6049; }
 
   /* Pannellum overrides */
   .pnlm-ui { font-family: inherit; }
   .pnlm-hot-spot-debug-indicator { display: none !important; }
   .pnlm-hotspot-base.pnlm-scene {
-    background: rgba(26,115,232,0.9);
+    background: rgba(143,191,114,0.92);
     border: 2px solid white;
     border-radius: 50%;
     width: 28px; height: 28px;
@@ -281,8 +470,8 @@
     height: 28px !important;
     border-radius: 50%;
     border: 2px solid #fff;
-    background: #22c55e;
-    box-shadow: 0 0 0 5px rgba(34,197,94,0.24), 0 8px 22px rgba(0,0,0,0.35);
+    background: var(--brand-green);
+    box-shadow: 0 0 0 5px rgba(81,135,70,0.22), 0 8px 22px rgba(33,58,33,0.24);
     cursor: pointer;
   }
   .lot-hotspot::after {
@@ -293,12 +482,12 @@
     background: #fff;
   }
   .lot-hotspot.lot-reserved {
-    background: #f59e0b;
-    box-shadow: 0 0 0 5px rgba(245,158,11,0.24), 0 8px 22px rgba(0,0,0,0.35);
+    background: #c99435;
+    box-shadow: 0 0 0 5px rgba(201,148,53,0.22), 0 8px 22px rgba(33,58,33,0.24);
   }
   .lot-hotspot.lot-sold {
-    background: #ef4444;
-    box-shadow: 0 0 0 5px rgba(239,68,68,0.24), 0 8px 22px rgba(0,0,0,0.35);
+    background: #b86b5d;
+    box-shadow: 0 0 0 5px rgba(184,107,93,0.22), 0 8px 22px rgba(33,58,33,0.24);
   }
   .lot-tooltip {
     position: absolute;
@@ -307,11 +496,11 @@
     transform: translateY(-50%);
     width: 210px;
     padding: 10px 12px;
-    border: 1px solid rgba(255,255,255,0.16);
-    border-radius: 8px;
-    background: rgba(15,17,23,0.92);
+    border: 1px solid rgba(33,58,33,0.16);
+    border-radius: 18px;
+    background: rgba(255,255,255,0.94);
     color: var(--text-primary);
-    box-shadow: 0 12px 34px rgba(0,0,0,0.35);
+    box-shadow: 0 18px 40px rgba(33,58,33,0.20);
     pointer-events: none;
     opacity: 0;
     transition: opacity 0.15s;
@@ -324,6 +513,7 @@
     font-size: 13px;
     font-weight: 700;
     margin-bottom: 6px;
+    color: var(--brand-green-deep);
   }
   .lot-tooltip-row {
     display: flex;
@@ -339,42 +529,42 @@
     margin-top: 8px;
     padding: 3px 7px;
     border-radius: 999px;
-    background: rgba(34,197,94,0.16);
-    color: #86efac;
+    background: rgba(81,135,70,0.14);
+    color: var(--brand-green);
     font-size: 11px;
     font-weight: 600;
   }
-  .lot-tooltip-status.reserved { background: rgba(245,158,11,0.16); color: #fcd34d; }
-  .lot-tooltip-status.sold { background: rgba(239,68,68,0.16); color: #fca5a5; }
+  .lot-tooltip-status.reserved { background: rgba(201,148,53,0.16); color: #9b6b1f; }
+  .lot-tooltip-status.sold { background: rgba(184,107,93,0.14); color: #9d4d42; }
 
   /* ── INFO OVERLAY ── */
   .info-overlay {
     position: absolute;
-    bottom: 24px;
+    bottom: 28px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(15,17,23,0.85);
+    background: rgba(255,255,255,0.92);
     backdrop-filter: blur(12px);
-    border: 1px solid var(--border-hover);
-    border-radius: var(--radius);
-    padding: 12px 20px;
+    border: 1px solid rgba(33,58,33,0.16);
+    border-radius: 28px;
+    padding: 13px 24px;
     min-width: 220px;
     max-width: 400px;
     text-align: center;
     pointer-events: none;
     transition: opacity 0.3s;
   }
-  .info-title { font-size: 14px; font-weight: 600; color: var(--text-primary); }
+  .info-title { font-size: 14px; font-weight: 700; color: var(--text-primary); text-transform: uppercase; letter-spacing: 0.04em; }
   .info-desc { font-size: 12px; color: var(--text-secondary); margin-top: 4px; }
 
   /* ── COUNTER BADGE ── */
   .counter-badge {
     position: absolute;
-    top: 16px;
-    right: 16px;
-    background: rgba(15,17,23,0.75);
+    top: 108px;
+    right: 18px;
+    background: rgba(255,255,255,0.90);
     backdrop-filter: blur(8px);
-    border: 1px solid var(--border-hover);
+    border: 1px solid rgba(33,58,33,0.15);
     border-radius: 20px;
     padding: 5px 12px;
     font-size: 12px;
@@ -386,11 +576,11 @@
   /* ── COORDS BADGE ── */
   .coords-badge {
     position: absolute;
-    top: 52px;
-    right: 16px;
-    background: rgba(15, 17, 23, 0.55);
+    top: 144px;
+    right: 18px;
+    background: rgba(255, 255, 255, 0.88);
     backdrop-filter: blur(8px);
-    border: 1px solid var(--border-hover);
+    border: 1px solid rgba(33,58,33,0.14);
     border-radius: 20px;
     padding: 5px 12px;
     font-size: 11px;
@@ -405,8 +595,8 @@
     gap: 6px;
   }
   .coords-badge:hover {
-    background: rgba(15, 17, 23, 0.9);
-    border-color: rgba(255, 255, 255, 0.25);
+    background: rgba(255, 255, 255, 0.96);
+    border-color: rgba(81,135,70,0.38);
     color: var(--text-primary);
     box-shadow: 0 4px 12px rgba(0,0,0,0.25);
   }
@@ -422,16 +612,136 @@
     font-weight: 600;
   }
 
+  /* ── LOT CARD ── */
+  .lot-card-panel {
+    position: absolute;
+    right: 18px;
+    top: 190px;
+    width: min(360px, calc(100vw - 36px));
+    z-index: 120;
+    background: rgba(255,255,255,0.95);
+    border: 1px solid rgba(33,58,33,0.16);
+    border-radius: 30px;
+    box-shadow: 0 24px 64px rgba(16,35,22,0.24);
+    backdrop-filter: blur(16px);
+    overflow: hidden;
+    transform: translateY(8px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.18s ease, transform 0.18s ease;
+  }
+  .lot-card-panel.open {
+    transform: translateY(0);
+    opacity: 1;
+    pointer-events: auto;
+  }
+  .lot-card-head {
+    padding: 18px 18px 14px;
+    background: linear-gradient(180deg, rgba(81,135,70,0.12), rgba(81,135,70,0));
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .lot-card-kicker {
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .lot-card-title {
+    color: var(--brand-green-deep);
+    font-size: 20px;
+    font-weight: 800;
+    line-height: 1.1;
+  }
+  .lot-card-close {
+    width: 34px;
+    height: 34px;
+    border: 1px solid rgba(33,58,33,0.14);
+    border-radius: 50%;
+    background: rgba(255,255,255,0.82);
+    color: var(--brand-green-deep);
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+  }
+  .lot-card-body {
+    padding: 0 18px 18px;
+  }
+  .lot-card-price {
+    color: var(--brand-green);
+    font-size: 26px;
+    font-weight: 900;
+    letter-spacing: 0;
+    margin: 4px 0 12px;
+  }
+  .lot-card-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+  .lot-card-field {
+    border: 1px solid rgba(33,58,33,0.10);
+    border-radius: 18px;
+    background: rgba(247,244,236,0.72);
+    padding: 10px;
+  }
+  .lot-card-label {
+    color: var(--text-muted);
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .lot-card-value {
+    color: var(--brand-green-deep);
+    font-size: 13px;
+    font-weight: 800;
+  }
+  .lot-card-text {
+    color: var(--text-secondary);
+    font-size: 13px;
+    line-height: 1.5;
+    margin-bottom: 14px;
+  }
+  .lot-card-actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+  .lot-action {
+    border: 1px solid rgba(81,135,70,0.26);
+    border-radius: 999px;
+    padding: 10px 12px;
+    background: rgba(81,135,70,0.10);
+    color: var(--brand-green-deep);
+    font-size: 12px;
+    font-weight: 800;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+  }
+  .lot-action.primary {
+    background: var(--brand-green);
+    color: white;
+    border-color: var(--brand-green);
+  }
+
   /* ── MAP BUTTON ── */
   .map-button {
     position: absolute;
-    right: 16px;
-    bottom: 16px;
-    width: 44px;
-    height: 44px;
+    right: 18px;
+    bottom: 26px;
+    width: 48px;
+    height: 48px;
     border-radius: 50%;
     border: 1px solid rgba(255,255,255,0.18);
-    background: rgba(15,17,23,0.86);
+    background: var(--accent);
     color: var(--text-primary);
     box-shadow: 0 12px 28px rgba(0,0,0,0.36);
     backdrop-filter: blur(12px);
@@ -444,7 +754,8 @@
   }
   .map-button:hover,
   .map-button:focus {
-    background: rgba(26,115,232,0.95);
+    background: var(--accent-hover);
+    color: white;
     border-color: rgba(255,255,255,0.32);
     transform: translateY(-2px);
     outline: none;
@@ -454,31 +765,135 @@
     height: 20px;
   }
 
+  .mobile-actions {
+    display: none;
+  }
+
   /* ── LOADING ── */
   .loading-screen {
     position: absolute; inset: 0;
-    background: var(--bg-dark);
+    background:
+      radial-gradient(circle at 28% 24%, rgba(81,135,70,0.16), transparent 30%),
+      radial-gradient(circle at 74% 72%, rgba(33,58,33,0.11), transparent 32%),
+      linear-gradient(135deg, #f7f4ec 0%, #ffffff 46%, #edf4ea 100%);
+    background-size: 140% 140%;
     display: flex; flex-direction: column;
     align-items: center; justify-content: center;
-    gap: 16px;
+    gap: 18px;
     z-index: 200;
     transition: opacity 0.4s;
+    overflow: hidden;
+    animation: loadingBackdrop 7s ease-in-out infinite alternate;
+  }
+  .loading-screen::before {
+    content: '';
+    position: absolute;
+    inset: 8%;
+    border: 1px solid rgba(81,135,70,0.12);
+    border-radius: 42px;
+    transform: rotate(-2deg);
+    pointer-events: none;
+  }
+  .loading-screen::after {
+    content: '';
+    position: absolute;
+    width: min(580px, 82vw);
+    height: min(580px, 82vw);
+    border-radius: 50%;
+    background: rgba(81,135,70,0.08);
+    filter: blur(2px);
+    animation: loadingHalo 5.6s ease-in-out infinite;
+  }
+  .loading-brand {
+    width: min(520px, 82vw);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 22px;
+    position: relative;
+    z-index: 1;
+    animation: loadingFloat 4.8s ease-in-out infinite;
+  }
+  .loading-brand img {
+    width: 100%;
+    height: 260px;
+    object-fit: contain;
+    border-radius: 30px;
+    background: var(--brand-cream);
+    box-shadow: 0 18px 52px rgba(33,58,33,0.16);
+    animation: loadingLogoPulse 3.4s ease-in-out infinite;
   }
   .loading-screen.hidden { opacity: 0; pointer-events: none; }
-  .spinner {
-    width: 36px; height: 36px;
-    border: 3px solid var(--border-hover);
-    border-top-color: var(--accent);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
+  .loading-progress {
+    position: relative;
+    width: min(280px, 62vw);
+    height: 3px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: rgba(33,58,33,0.12);
   }
-  @keyframes spin { to { transform: rotate(360deg); } }
-  .loading-text { font-size: 13px; color: var(--text-secondary); }
+  .loading-progress::before {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 0;
+    width: 44%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, transparent, var(--brand-green), transparent);
+    animation: loadingSweep 1.65s ease-in-out infinite;
+  }
+  .loading-text {
+    position: relative;
+    z-index: 1;
+    font-size: 13px;
+    color: var(--brand-green-deep);
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    text-align: center;
+    min-height: 18px;
+    transition: opacity 0.35s ease, transform 0.35s ease;
+  }
+  .loading-text.is-changing {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  .loading-subtext {
+    position: relative;
+    z-index: 1;
+    max-width: 520px;
+    padding: 0 24px;
+    color: var(--text-secondary);
+    font-size: 14px;
+    line-height: 1.5;
+    text-align: center;
+  }
+  @keyframes loadingBackdrop {
+    from { background-position: 0% 30%; }
+    to { background-position: 100% 70%; }
+  }
+  @keyframes loadingHalo {
+    0%, 100% { transform: scale(0.88); opacity: 0.55; }
+    50% { transform: scale(1.06); opacity: 0.9; }
+  }
+  @keyframes loadingFloat {
+    0%, 100% { transform: translate3d(0, -8px, 0); }
+    50% { transform: translate3d(0, 10px, 0); }
+  }
+  @keyframes loadingLogoPulse {
+    0%, 100% { transform: scale(0.985); box-shadow: 0 18px 52px rgba(33,58,33,0.14); }
+    50% { transform: scale(1.02); box-shadow: 0 24px 68px rgba(33,58,33,0.22); }
+  }
+  @keyframes loadingSweep {
+    from { transform: translateX(-110%); }
+    to { transform: translateX(255%); }
+  }
 
   /* ── ERROR ── */
   .error-screen {
     position: absolute; inset: 0;
-    background: var(--bg-dark);
+    background:
+      radial-gradient(circle at 50% 28%, rgba(143,191,114,0.10), transparent 34%),
+      var(--bg-dark);
     display: none;
     flex-direction: column;
     align-items: center; justify-content: center;
@@ -507,19 +922,57 @@
   /* ── MOBILE ── */
   @media (max-width: 768px) {
     :root { --sidebar-w: 260px; }
+    .topbar { top: 12px; left: 12px; right: 12px; height: 58px; padding: 0 12px; gap: 10px; }
+    .brand-logo-img { width: 92px; height: 46px; }
+    .brand-kicker { display: none; }
     .sidebar {
-      position: absolute;
-      top: 0; left: 0; bottom: 0;
+      top: 82px;
+      left: 12px;
+      bottom: 12px;
+      max-height: calc(100vh - 94px);
       z-index: 50;
-      transform: translateX(-100%);
     }
     .sidebar.open { transform: translateX(0); box-shadow: 8px 0 24px rgba(0,0,0,0.5); }
     .btn-sidebar-toggle { display: flex; }
     .topbar-title { display: none; }
-    .counter-badge { top: 12px; right: 12px; }
-    .coords-badge { top: 48px; right: 12px; }
-    .map-button { right: 12px; bottom: 12px; }
-    .info-overlay { bottom: 16px; left: 16px; right: 16px; transform: none; }
+    .btn-request { display: none; }
+    .sidebar-brand img { height: 72px; }
+    .counter-badge { top: 82px; right: 12px; }
+    .coords-badge { top: 118px; right: 12px; max-width: calc(100vw - 24px); }
+    .map-button { display: none; }
+    .info-overlay { bottom: 86px; left: 16px; right: 16px; transform: none; }
+    .lot-card-panel { left: 12px; right: 12px; top: auto; bottom: 86px; width: auto; }
+    .mobile-actions {
+      position: absolute;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      z-index: 130;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      padding: 8px;
+      border: 1px solid rgba(33,58,33,0.14);
+      border-radius: 26px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(14px);
+      box-shadow: 0 14px 40px rgba(16,35,22,0.22);
+    }
+    .mobile-action {
+      border: 0;
+      border-radius: 999px;
+      background: rgba(81,135,70,0.10);
+      color: var(--brand-green-deep);
+      min-height: 42px;
+      font-size: 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+    .mobile-action.primary {
+      background: var(--brand-green);
+      color: white;
+    }
+    .loading-brand img { height: 190px; }
   }
 
   /* ── EMPTY STATE ── */
@@ -537,14 +990,14 @@
 
   /* ── CUSTOM POLYGON TOOLTIP ── */
   .polygon-tooltip {
-    background: rgba(12, 14, 20, 0.94);
+    background: rgba(255,255,255,0.95);
     backdrop-filter: blur(14px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-    border-radius: 8px;
-    padding: 10px 12px;
+    border: 1px solid rgba(33,58,33,0.16);
+    border-radius: 18px;
+    padding: 12px 14px;
     color: var(--text-primary);
-    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.42), 0 1px 0 rgba(255,255,255,0.08) inset;
-    width: 210px;
+    box-shadow: 0 18px 42px rgba(33,58,33,0.22);
+    width: 220px;
     font-size: 13px;
     line-height: 1.4;
     pointer-events: none;
@@ -565,9 +1018,9 @@
     bottom: -6px;
     width: 10px;
     height: 10px;
-    background: rgba(12, 14, 20, 0.94);
-    border-right: 1px solid rgba(255,255,255,0.18);
-    border-bottom: 1px solid rgba(255,255,255,0.18);
+    background: rgba(255,255,255,0.95);
+    border-right: 1px solid rgba(33,58,33,0.16);
+    border-bottom: 1px solid rgba(33,58,33,0.16);
     transform: translateX(-50%) rotate(45deg);
   }
   .polygon-tooltip.below::after {
@@ -575,8 +1028,8 @@
     bottom: auto;
     border-right: 0;
     border-bottom: 0;
-    border-left: 1px solid rgba(255,255,255,0.18);
-    border-top: 1px solid rgba(255,255,255,0.18);
+    border-left: 1px solid rgba(33,58,33,0.16);
+    border-top: 1px solid rgba(33,58,33,0.16);
   }
   .polygon-tooltip-title {
     font-weight: 700;
@@ -584,7 +1037,7 @@
     margin-bottom: 7px;
     border-bottom: 1px solid var(--border);
     padding-bottom: 6px;
-    color: var(--text-primary);
+    color: var(--brand-green-deep);
   }
   .polygon-tooltip-row {
     display: flex;
@@ -607,9 +1060,9 @@
     font-size: 11px;
     font-weight: 600;
   }
-  .polygon-tooltip-status.available { background: rgba(34,197,94,0.16); color: #86efac; }
-  .polygon-tooltip-status.reserved { background: rgba(245,158,11,0.16); color: #fcd34d; }
-  .polygon-tooltip-status.sold { background: rgba(239,68,68,0.16); color: #fca5a5; }
+  .polygon-tooltip-status.available { background: rgba(81,135,70,0.14); color: var(--brand-green); }
+  .polygon-tooltip-status.reserved { background: rgba(201,148,53,0.16); color: #9b6b1f; }
+  .polygon-tooltip-status.sold { background: rgba(184,107,93,0.14); color: #9d4d42; }
 
   /* ── EDITOR PANEL & CONTROLS ── */
   .editor-panel {
@@ -617,10 +1070,11 @@
     top: 0;
     right: 0;
     bottom: 0;
-    width: 320px;
-    background: rgba(15, 17, 23, 0.95);
-    backdrop-filter: blur(12px);
-    border-left: 1px solid var(--border);
+    width: 340px;
+    background: rgba(255,255,255,0.94);
+    backdrop-filter: blur(18px);
+    border-left: 1px solid rgba(33,58,33,0.14);
+    box-shadow: -18px 0 52px rgba(33,58,33,0.18);
     z-index: 150;
     transform: translateX(100%);
     transition: transform 0.3s ease;
@@ -631,27 +1085,30 @@
     transform: translateX(0);
   }
   .editor-header {
-    padding: 16px;
-    border-bottom: 1px solid var(--border);
+    padding: 18px;
+    border-bottom: 1px solid rgba(33,58,33,0.10);
+    background: linear-gradient(180deg, rgba(81,135,70,0.10), rgba(81,135,70,0));
     display: flex;
     justify-content: space-between;
     align-items: center;
   }
   .editor-header h3 {
     font-size: 14px;
-    font-weight: 600;
-    color: var(--text-primary);
+    font-weight: 700;
+    color: var(--brand-green-deep);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
   }
   .btn-close {
     background: transparent;
     border: none;
-    color: var(--text-secondary);
+    color: var(--brand-green);
     font-size: 20px;
     cursor: pointer;
     line-height: 1;
   }
   .editor-body {
-    padding: 16px;
+    padding: 18px;
     display: flex;
     flex-direction: column;
     gap: 12px;
@@ -673,8 +1130,8 @@
     gap: 8px;
   }
   .editor-controls button {
-    padding: 8px 12px;
-    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    border-radius: 999px;
     font-size: 12px;
     font-weight: 600;
     cursor: pointer;
@@ -684,6 +1141,7 @@
   .btn-primary {
     background: var(--accent);
     color: white;
+    box-shadow: 0 10px 24px rgba(81,135,70,0.20);
   }
   .btn-primary:hover:not(:disabled) {
     background: var(--accent-hover);
@@ -693,9 +1151,9 @@
     cursor: not-allowed;
   }
   .btn-secondary {
-    background: var(--bg-card);
+    background: rgba(81,135,70,0.07);
     color: var(--text-primary);
-    border-color: var(--border);
+    border-color: rgba(33,58,33,0.14);
   }
   .btn-secondary:hover:not(:disabled) {
     background: var(--bg-card-hover);
@@ -711,6 +1169,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    padding: 10px 12px;
+    border-radius: 16px;
+    background: rgba(81,135,70,0.07);
   }
   .editor-polygons-list {
     display: flex;
@@ -719,10 +1180,10 @@
     margin-top: 8px;
   }
   .saved-poly-card {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 10px;
+    background: rgba(247,244,236,0.82);
+    border: 1px solid rgba(33,58,33,0.12);
+    border-radius: 18px;
+    padding: 12px;
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -730,7 +1191,7 @@
   .saved-poly-title {
     font-size: 12px;
     font-weight: 600;
-    color: var(--text-primary);
+    color: var(--brand-green-deep);
   }
   .saved-poly-coords {
     font-size: 10px;
@@ -739,9 +1200,10 @@
     word-break: break-all;
     max-height: 60px;
     overflow-y: auto;
-    background: rgba(0,0,0,0.2);
-    padding: 4px;
-    border-radius: 4px;
+    background: rgba(255,255,255,0.72);
+    padding: 7px;
+    border: 1px solid rgba(33,58,33,0.08);
+    border-radius: 10px;
   }
   .saved-poly-coords::-webkit-scrollbar { width: 3px; }
   .saved-poly-coords::-webkit-scrollbar-thumb { background: var(--text-muted); }
@@ -757,7 +1219,7 @@
     cursor: pointer;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border);
-    background: transparent;
+    background: rgba(255,255,255,0.72);
     color: var(--text-secondary);
     transition: all 0.15s;
   }
@@ -767,22 +1229,22 @@
     border-color: var(--border-hover);
   }
   .btn-poly-copy:hover {
-    color: #4ade80 !important;
-    border-color: rgba(74, 222, 128, 0.4) !important;
+    color: var(--brand-green) !important;
+    border-color: rgba(81,135,70,0.42) !important;
   }
   .btn-poly-edit:hover {
-    color: #f59e0b !important;
-    border-color: rgba(245, 158, 11, 0.4) !important;
+    color: #9b6b1f !important;
+    border-color: rgba(201,148,53,0.42) !important;
   }
   .btn-poly-delete:hover {
-    color: #ef4444 !important;
-    border-color: rgba(239, 68, 68, 0.4) !important;
+    color: #9d4d42 !important;
+    border-color: rgba(184,107,93,0.42) !important;
   }
   
   .btn-icon.active {
-    background: rgba(26,115,232,0.2) !important;
-    color: #6aabff !important;
-    border-color: rgba(26,115,232,0.4) !important;
+    background: var(--brand-green-deep) !important;
+    color: white !important;
+    border-color: var(--brand-green-deep) !important;
   }
 </style>
 </head>
@@ -797,25 +1259,34 @@
 
   // 2. Имя листа (вкладки) в таблице
   const SHEET_NAME = 'Турыы';
+
+  // Временный ключ редактора. Для продакшена лучше проверять его на backend.
+  const EDITOR_KEY = 'landjer-admin-2026';
+
+  // Контакт для заявок. Если WhatsApp появится позже, вставьте номер в формате 77001234567.
+  const CONTACT_WHATSAPP = '';
+  const REQUEST_URL = 'https://landjer.kz';
 </script>
 <!-- ═══════════════════════════════════════ -->
 
 <!-- TOP BAR -->
 <header class="topbar">
   <div class="topbar-logo">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/>
-      <line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/>
-      <line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/>
-    </svg>
-    360° Тур
+    <a class="brand-logo-link" href="https://landjer.kz" target="_blank" rel="noopener" aria-label="Открыть сайт LANDJER">
+      <img class="brand-logo-img" src="logo4-2.png" alt="LANDJER">
+      <div class="brand-kicker" aria-hidden="true">
+        <span>360 Тур</span>
+        <span>Жер телімдері</span>
+      </div>
+    </a>
   </div>
-  <div class="topbar-title" id="topbarTitle">Загрузка...</div>
+  <div class="topbar-title" id="topbarTitle">LANDJER</div>
   <div class="topbar-actions">
+    <button class="btn-request" id="topRequestButton" type="button">Оставить заявку</button>
     <button class="btn-icon btn-sidebar-toggle" id="sidebarToggle" title="Открыть меню" aria-label="Открыть список сцен">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
-    <button class="btn-icon" id="btnEditMode" title="Режим редактирования (Создание полигонов)" aria-label="Режим редактирования">
+    <button class="btn-icon editor-only" id="btnEditMode" title="Режим редактирования (Создание полигонов)" aria-label="Режим редактирования">
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/>
       </svg>
@@ -830,16 +1301,34 @@
 
   <!-- SIDEBAR -->
   <aside class="sidebar" id="sidebar" role="navigation" aria-label="Список сцен">
+    <div class="sidebar-brand">
+      <a href="https://landjer.kz" target="_blank" rel="noopener" aria-label="Открыть сайт LANDJER">
+        <img src="logo4-2.png" alt="LANDJER">
+      </a>
+      <div class="sidebar-brand-meta">
+        <span>Продажа участков</span>
+        <span>VR</span>
+      </div>
+    </div>
     <div class="sidebar-search">
       <div class="search-wrap">
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
         <input type="search" id="searchInput" placeholder="Поиск локации..." autocomplete="off">
       </div>
     </div>
+    <div class="lot-tools" id="lotTools">
+      <div class="lot-tools-title">Статусы участков</div>
+      <div class="status-filter-row">
+        <button class="status-filter is-active" type="button" data-status-filter="available"><span class="status-dot"></span>В продаже</button>
+        <button class="status-filter is-active" type="button" data-status-filter="reserved"><span class="status-dot reserved"></span>Бронь</button>
+        <button class="status-filter is-active" type="button" data-status-filter="sold"><span class="status-dot sold"></span>Продано</button>
+      </div>
+      <div class="lot-stats" id="lotStats"></div>
+    </div>
     <div class="sidebar-list" id="sceneList" role="list">
       <div class="empty-state">
         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-        Загрузка сцен...
+        LANDJER 360°
       </div>
     </div>
   </aside>
@@ -851,8 +1340,12 @@
 
     <!-- Loading -->
     <div class="loading-screen" id="loadingScreen">
-      <div class="spinner"></div>
-      <div class="loading-text" id="loadingText">Загрузка данных из таблицы...</div>
+      <div class="loading-brand">
+        <img src="logo4-2.png" alt="LANDJER">
+        <div class="loading-progress" aria-hidden="true"></div>
+      </div>
+      <div class="loading-text" id="loadingText">LANDJER</div>
+      <div class="loading-subtext">Жер телімдерін 360° форматында қараңыз</div>
     </div>
 
     <!-- Error -->
@@ -875,12 +1368,15 @@
     </div>
 
     <!-- Coords -->
-    <div class="coords-badge" id="coordsBadge" title="Нажмите, чтобы скопировать yaw,pitch">
+    <div class="coords-badge editor-only" id="coordsBadge" title="Нажмите, чтобы скопировать yaw,pitch">
       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
         <circle cx="12" cy="12" r="10"/><line x1="12" y1="2" x2="12" y2="6"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="2" y1="12" x2="6" y2="12"/><line x1="18" y1="12" x2="22" y2="12"/>
       </svg>
       <span id="coordsText">Yaw: <span id="coordsYaw">—</span>° | Pitch: <span id="coordsPitch">—</span>°</span>
     </div>
+
+    <!-- Lot details -->
+    <aside class="lot-card-panel" id="lotCardPanel" aria-live="polite" aria-label="Карточка участка"></aside>
 
     <!-- Map -->
     <button class="map-button" id="mapButton" type="button" title="Открыть на Google Карте" aria-label="Открыть место на Google Карте">
@@ -890,11 +1386,18 @@
       </svg>
     </button>
 
+    <!-- Mobile actions -->
+    <div class="mobile-actions" aria-label="Основные действия">
+      <button class="mobile-action" id="mobileMenuButton" type="button">Меню</button>
+      <button class="mobile-action" id="mobileMapButton" type="button">Карта</button>
+      <button class="mobile-action primary" id="mobileRequestButton" type="button">Заявка</button>
+    </div>
+
     <!-- Custom Polygon Tooltip -->
     <div class="polygon-tooltip" id="polygonTooltip"></div>
 
     <!-- Editor Panel -->
-    <div class="editor-panel" id="editorPanel">
+    <div class="editor-panel editor-only" id="editorPanel">
       <div class="editor-header">
         <h3>Редактор полигонов</h3>
         <button class="btn-close" id="btnCloseEditor">&times;</button>
@@ -962,18 +1465,47 @@ let lotPolygonsByScene = {};
 let polygonAnimationId = null;
 let activePolygonTooltipKey = null;
 let lastPolygonPointer = { x: 0, y: 0, inside: false };
+let activeLot = null;
+const activeLotStatuses = new Set(['available', 'reserved', 'sold']);
+const urlParams = new URLSearchParams(location.search);
+const isEditorMode = urlParams.get('mode') === 'editor' && urlParams.get('key') === EDITOR_KEY;
+
+document.body.classList.toggle('editor-mode', isEditorMode);
+document.querySelectorAll('.editor-only').forEach(element => {
+  element.classList.toggle('is-hidden', !isEditorMode);
+});
+
+const SHEET_TIMEOUT_MS = 45000;
+const SHEET_RETRY_COUNT = 2;
+
+function wait(ms) {
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
 
 // Получаем данные из Google Sheets через JSONP, чтобы локальный HTML не упирался в CORS.
 async function fetchSheetData() {
+  let lastError = null;
+  for (let attempt = 1; attempt <= SHEET_RETRY_COUNT; attempt++) {
+    try {
+      return await fetchSheetDataOnce(attempt);
+    } catch (err) {
+      lastError = err;
+      if (attempt < SHEET_RETRY_COUNT) await wait(1200);
+    }
+  }
+  throw lastError || new Error('Не удалось загрузить Google Таблицу');
+}
+
+function fetchSheetDataOnce(attempt) {
   const callbackName = `sheetCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&headers=1&tqx=${encodeURIComponent(`out:json;responseHandler:${callbackName}`)}&cachebust=${Date.now()}`;
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&headers=1&tqx=${encodeURIComponent(`out:json;responseHandler:${callbackName}`)}`;
 
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
     const timer = setTimeout(() => {
       cleanup();
-      reject(new Error('Таблица не ответила за 15 секунд'));
-    }, 15000);
+      reject(new Error(`Таблица не ответила за ${Math.round(SHEET_TIMEOUT_MS / 1000)} секунд. Попытка ${attempt}/${SHEET_RETRY_COUNT}`));
+    }, SHEET_TIMEOUT_MS);
 
     function cleanup() {
       clearTimeout(timer);
@@ -1093,9 +1625,74 @@ function escapeHTML(value) {
 
 function statusInfo(status) {
   const value = String(status || 'available').toLowerCase();
-  if (value === 'sold' || value === 'продан' || value === 'продано') return { key: 'sold', label: 'Продан' };
+  if (value === 'sold' || value === 'продан' || value === 'продано') return { key: 'sold', label: 'Продано' };
   if (value === 'reserved' || value === 'бронь' || value === 'забронирован') return { key: 'reserved', label: 'Бронь' };
   return { key: 'available', label: 'В продаже' };
+}
+
+function statusClass(status) {
+  return statusInfo(status).key;
+}
+
+function visibleLot(lot) {
+  return activeLotStatuses.has(statusClass(lot.status));
+}
+
+function requestUrlForLot(lot) {
+  const title = lot?.title || 'участок';
+  const text = `Здравствуйте! Интересует ${title}${lot?.area ? `, площадь ${lot.area}` : ''}${lot?.price ? `, цена ${lot.price}` : ''}.`;
+  if (CONTACT_WHATSAPP) return `https://wa.me/${CONTACT_WHATSAPP}?text=${encodeURIComponent(text)}`;
+  return lot?.link || REQUEST_URL;
+}
+
+function openLotCard(lot) {
+  activeLot = lot;
+  const panel = document.getElementById('lotCardPanel');
+  if (!panel) return;
+
+  const status = statusInfo(lot.status);
+  const requestUrl = requestUrlForLot(lot);
+  panel.innerHTML = `
+    <div class="lot-card-head">
+      <div>
+        <div class="lot-card-kicker">Участок</div>
+        <div class="lot-card-title">${escapeHTML(lot.title || 'Участок')}</div>
+      </div>
+      <button class="lot-card-close" id="lotCardClose" type="button" aria-label="Закрыть карточку">&times;</button>
+    </div>
+    <div class="lot-card-body">
+      <div class="lot-card-price">${escapeHTML(lot.price || 'Цена по запросу')}</div>
+      <div class="lot-card-grid">
+        <div class="lot-card-field">
+          <div class="lot-card-label">Площадь</div>
+          <div class="lot-card-value">${escapeHTML(lot.area || '—')}</div>
+        </div>
+        <div class="lot-card-field">
+          <div class="lot-card-label">Статус</div>
+          <div class="lot-card-value">${status.label}</div>
+        </div>
+      </div>
+      ${lot.text ? `<div class="lot-card-text">${escapeHTML(lot.text)}</div>` : ''}
+      <div class="lot-card-actions">
+        <a class="lot-action primary" href="${escapeHTML(requestUrl)}" target="_blank" rel="noopener">Оставить заявку</a>
+        <button class="lot-action" id="lotCardFocus" type="button">Показать</button>
+      </div>
+    </div>
+  `;
+  panel.classList.add('open');
+  document.getElementById('lotCardClose')?.addEventListener('click', closeLotCard);
+  document.getElementById('lotCardFocus')?.addEventListener('click', () => {
+    if (lot.points?.length && viewer) {
+      const avgYaw = lot.points.reduce((sum, point) => sum + point.yaw, 0) / lot.points.length;
+      const avgPitch = lot.points.reduce((sum, point) => sum + point.pitch, 0) / lot.points.length;
+      viewer.lookAt(avgPitch, avgYaw, Math.min(viewer.getHfov(), 86), 900);
+    }
+  });
+}
+
+function closeLotCard() {
+  activeLot = null;
+  document.getElementById('lotCardPanel')?.classList.remove('open');
 }
 
 function parseLotPoints(value) {
@@ -1127,7 +1724,7 @@ function createLotTooltip(hotSpotDiv, args) {
 }
 
 function openLotDetails(event, args) {
-  if (args.link) window.open(args.link, '_blank', 'noopener');
+  openLotCard(args);
 }
 
 function lotArgsFromRow(row) {
@@ -1272,7 +1869,7 @@ function renderLotPolygons() {
   const layer = document.getElementById('lotPolygonLayer');
   const wrap = document.getElementById('panorama');
   const tooltip = document.getElementById('polygonTooltip');
-  const lots = lotPolygonsByScene[currentSceneId] || [];
+  const lots = (lotPolygonsByScene[currentSceneId] || []).filter(visibleLot);
   const width = wrap.clientWidth;
   const height = wrap.clientHeight;
   let hoveredLot = null;
@@ -1300,12 +1897,10 @@ function renderLotPolygons() {
       hoveredLotPoints = validPoints;
     }
 
-    if (lot.link) {
-      polygon.addEventListener('click', () => window.open(lot.link, '_blank', 'noopener'));
-      polygon.addEventListener('keydown', e => {
-        if (e.key === 'Enter' || e.key === ' ') window.open(lot.link, '_blank', 'noopener');
-      });
-    }
+    polygon.addEventListener('click', () => openLotCard(lot));
+    polygon.addEventListener('keydown', e => {
+      if (e.key === 'Enter' || e.key === ' ') openLotCard(lot);
+    });
 
     polygon.addEventListener('focus', () => {
       showPolygonTooltip(lot, validPoints, width, height);
@@ -1337,7 +1932,9 @@ function renderLotPolygons() {
     hidePolygonTooltip();
   }
 
-  // 2. Отображение созданных полигонов в текущей сессии (фиолетовый цвет, кликабельные для редактирования)
+  if (!isEditorMode) return;
+
+  // 2. Отображение созданных полигонов в текущей сессии
   const currentSavedPolys = getSavedPolygons();
   currentSavedPolys.forEach((poly, index) => {
     const screenPoints = poly.points.map(point => projectPoint(point, width, height));
@@ -1345,7 +1942,7 @@ function renderLotPolygons() {
     if (validPoints.length < 3) return;
 
     const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-    polygon.setAttribute('style', 'fill: rgba(139, 92, 246, 0.03); stroke: rgba(167, 139, 250, 0.95); stroke-width: 3; vector-effect: non-scaling-stroke; pointer-events: auto; cursor: pointer;');
+    polygon.setAttribute('style', 'fill: rgba(81, 135, 70, 0.10); stroke: rgba(81, 135, 70, 0.88); stroke-width: 3; vector-effect: non-scaling-stroke; pointer-events: auto; cursor: pointer;');
     polygon.setAttribute('points', validPoints.map(point => `${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(' '));
     
     const title = document.createElementNS('http://www.w3.org/2000/svg', 'title');
@@ -1377,7 +1974,7 @@ function renderLotPolygons() {
     // Рисуем пунктирные границы как polyline (не соединяем последнюю точку с первой до завершения)
     if (validPoints.length >= 2) {
       const polyline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
-      polyline.setAttribute('style', 'fill: none; stroke: rgba(245, 158, 11, 0.85); stroke-width: 2; stroke-dasharray: 4 4; pointer-events: none;');
+      polyline.setAttribute('style', 'fill: none; stroke: rgba(81, 135, 70, 0.86); stroke-width: 2.5; stroke-dasharray: 6 5; pointer-events: none;');
       polyline.setAttribute('points', validPoints.map(point => `${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(' '));
       layer.appendChild(polyline);
     }
@@ -1389,7 +1986,7 @@ function renderLotPolygons() {
       circle.setAttribute('cx', pt.x.toFixed(1));
       circle.setAttribute('cy', pt.y.toFixed(1));
       circle.setAttribute('r', idx === 0 ? '6' : '4');
-      circle.setAttribute('style', `fill: ${idx === 0 ? '#ef4444' : '#f59e0b'}; stroke: #fff; stroke-width: 1.5; cursor: pointer;`);
+      circle.setAttribute('style', `fill: ${idx === 0 ? '#213a21' : '#518746'}; stroke: #fff; stroke-width: 1.8; cursor: pointer; filter: drop-shadow(0 3px 8px rgba(33,58,33,0.24));`);
       circle.setAttribute('data-vertex-index', idx.toString());
       layer.appendChild(circle);
     });
@@ -1447,9 +2044,7 @@ function buildConfig(rows) {
           createTooltipFunc: createLotTooltip,
           createTooltipArgs: lotArgsFromRow(row),
           clickHandlerFunc: openLotDetails,
-          clickHandlerArgs: {
-            link: row[COL.lotLink],
-          },
+          clickHandlerArgs: lotArgsFromRow(row),
         });
       }
     }
@@ -1471,6 +2066,7 @@ function buildConfig(rows) {
       sceneFadeDuration: 1000,
       autoLoad: true,
       showControls: true,
+      crossOrigin: 'anonymous',
       hfov: 100,
       minHfov: 50,
       maxHfov: 120,
@@ -1531,10 +2127,42 @@ function renderSidebar(rows) {
   });
 }
 
+function renderLotStats(rows) {
+  const stats = { available: 0, reserved: 0, sold: 0 };
+  rows.filter(row => row[COL.lotId]).forEach(row => {
+    stats[statusClass(row[COL.lotStatus])]++;
+  });
+
+  const el = document.getElementById('lotStats');
+  if (!el) return;
+  el.innerHTML = `
+    <div class="lot-stat"><span><span class="status-dot"></span> В продаже</span><strong>${stats.available}</strong></div>
+    <div class="lot-stat"><span><span class="status-dot reserved"></span> Бронь</span><strong>${stats.reserved}</strong></div>
+    <div class="lot-stat"><span><span class="status-dot sold"></span> Продано</span><strong>${stats.sold}</strong></div>
+  `;
+}
+
+document.querySelectorAll('[data-status-filter]').forEach(button => {
+  button.addEventListener('click', () => {
+    const status = button.dataset.statusFilter;
+    if (!status) return;
+    if (activeLotStatuses.has(status)) {
+      activeLotStatuses.delete(status);
+      button.classList.remove('is-active');
+    } else {
+      activeLotStatuses.add(status);
+      button.classList.add('is-active');
+    }
+    if (activeLot && !visibleLot(activeLot)) closeLotCard();
+    renderLotPolygons();
+  });
+});
+
 // Загрузка сцены
 function loadScene(sceneId) {
   if (!viewer || currentSceneId === sceneId) return;
   hidePolygonTooltip();
+  closeLotCard();
   viewer.loadScene(sceneId);
   currentSceneId = sceneId;
   updateSidebarActive(sceneId);
@@ -1580,8 +2208,9 @@ function updateMapButton(row) {
 }
 
 // Инициализация viewer
-function initViewer(config) {
+function initViewer(config, onFirstLoad) {
   viewer = pannellum.viewer('panorama', config);
+  let firstLoadHandled = false;
 
   const firstId = config.default.firstScene;
   currentSceneId = firstId;
@@ -1590,8 +2219,15 @@ function initViewer(config) {
   startPolygonRenderer();
   updateSavedPolygonsList();
 
+  viewer.on('load', () => {
+    if (firstLoadHandled) return;
+    firstLoadHandled = true;
+    if (typeof onFirstLoad === 'function') onFirstLoad();
+  });
+
   viewer.on('scenechange', id => {
     hidePolygonTooltip();
+    closeLotCard();
     currentSceneId = id;
     updateSidebarActive(id);
     updateOverlay(id);
@@ -1630,6 +2266,22 @@ document.getElementById('mapButton').addEventListener('click', () => {
   window.open(url, '_blank', 'noopener');
 });
 
+document.getElementById('mobileMenuButton')?.addEventListener('click', () => {
+  document.getElementById('sidebar').classList.toggle('open');
+});
+
+document.getElementById('mobileMapButton')?.addEventListener('click', () => {
+  document.getElementById('mapButton')?.click();
+});
+
+document.getElementById('mobileRequestButton')?.addEventListener('click', () => {
+  window.open(requestUrlForLot(activeLot), '_blank', 'noopener');
+});
+
+document.getElementById('topRequestButton')?.addEventListener('click', () => {
+  window.open(requestUrlForLot(activeLot), '_blank', 'noopener');
+});
+
 // Координаты под курсором мыши
 let lastMouseCoords = { yaw: 0, pitch: 0 };
 
@@ -1649,6 +2301,11 @@ document.getElementById('panorama').addEventListener('mousemove', (event) => {
     }
   }
 });
+
+// Оставляем стандартное меню браузера по ПКМ вместо меню Pannellum.
+document.getElementById('panorama').addEventListener('contextmenu', (event) => {
+  event.stopImmediatePropagation();
+}, true);
 
 // Копирование координат при клике
 const coordsBadge = document.getElementById('coordsBadge');
@@ -1695,6 +2352,7 @@ const btnCloseEditor = document.getElementById('btnCloseEditor');
 
 if (btnEditMode && editorPanel) {
   btnEditMode.addEventListener('click', () => {
+    if (!isEditorMode) return;
     const isOpen = editorPanel.classList.toggle('open');
     btnEditMode.classList.toggle('active', isOpen);
     
@@ -1710,6 +2368,7 @@ if (btnEditMode && editorPanel) {
 
 if (btnCloseEditor && editorPanel && btnEditMode) {
   btnCloseEditor.addEventListener('click', () => {
+    if (!isEditorMode) return;
     editorPanel.classList.remove('open');
     btnEditMode.classList.remove('active');
     currentDrawingPoints = [];
@@ -1727,6 +2386,7 @@ const btnFinishPolygon = document.getElementById('btnFinishPolygon');
 
 if (btnNewPolygon) {
   btnNewPolygon.addEventListener('click', () => {
+    if (!isEditorMode) return;
     isDrawingMode = true;
     currentDrawingPoints = [];
     updateCurrentPointsDisplay();
@@ -1736,6 +2396,7 @@ if (btnNewPolygon) {
 
 if (btnUndoPoint) {
   btnUndoPoint.addEventListener('click', () => {
+    if (!isEditorMode) return;
     if (currentDrawingPoints.length > 0) {
       currentDrawingPoints.pop();
       updateCurrentPointsDisplay();
@@ -1746,11 +2407,13 @@ if (btnUndoPoint) {
 
 if (btnFinishPolygon) {
   btnFinishPolygon.addEventListener('click', () => {
+    if (!isEditorMode) return;
     finishCurrentPolygon();
   });
 }
 
 function finishCurrentPolygon() {
+  if (!isEditorMode) return;
   if (currentDrawingPoints.length < 3) {
     alert('Пожалуйста, добавьте как минимум 3 точки, чтобы завершить полигон.');
     return;
@@ -1783,6 +2446,7 @@ function updateCurrentPointsDisplay() {
 
 // Функция перевода полигона в режим редактирования
 function editSavedPolygon(idx) {
+  if (!isEditorMode) return;
   if (isDrawingMode) {
     if (currentDrawingPoints.length > 0) {
       if (!confirm('Вы уже рисуете или редактируете другой полигон. Сбросить текущий черновик и начать редактирование этого полигона?')) {
@@ -1888,12 +2552,14 @@ if (viewerWrap) {
   });
 
   viewerWrap.addEventListener('mousedown', (e) => {
+    if (!isEditorMode) return;
     if (e.button !== 0) return;
     if (e.target.closest('#editorPanel') || e.target.closest('.map-button') || e.target.closest('.coords-badge') || e.target.closest('.counter-badge') || e.target.closest('.info-overlay') || e.target.closest('.topbar') || e.target.closest('.sidebar')) return;
     clickStartPos = { x: e.clientX, y: e.clientY };
   });
 
   viewerWrap.addEventListener('mouseup', (e) => {
+    if (!isEditorMode) return;
     if (!isDrawingMode || !viewer) return;
     if (e.button !== 0) return;
     if (e.target.closest('#editorPanel') || e.target.closest('.map-button') || e.target.closest('.coords-badge') || e.target.closest('.counter-badge') || e.target.closest('.info-overlay') || e.target.closest('.topbar') || e.target.closest('.sidebar')) return;
@@ -1934,9 +2600,33 @@ function showError(msg) {
   document.getElementById('errorScreen').classList.add('show');
 }
 
+function startIntroMessages() {
+  const text = document.getElementById('loadingText');
+  if (!text) return null;
+
+  const messages = [
+    'LANDJER',
+    'Жер телімдері',
+    '360° кеңістік',
+    'Косшыдағы жаңа мүмкіндік',
+  ];
+  let index = 0;
+
+  return setInterval(() => {
+    text.classList.add('is-changing');
+    setTimeout(() => {
+      index = (index + 1) % messages.length;
+      text.textContent = messages[index];
+      text.classList.remove('is-changing');
+    }, 350);
+  }, 1800);
+}
+
 // ══ СТАРТ ══
 (async function main() {
+  const introTimer = startIntroMessages();
   if (!SHEET_ID || SHEET_ID === 'ВАШ_ID_ТАБЛИЦЫ_ЗДЕСЬ') {
+    if (introTimer) clearInterval(introTimer);
     showError(`
       Укажите <strong>SHEET_ID</strong> в начале файла.<br><br>
       Откройте Google Таблицу и скопируйте ID из ссылки:<br>
@@ -1949,29 +2639,34 @@ function showError(msg) {
   }
 
   try {
-    document.getElementById('loadingText').textContent = 'Загрузка данных из Google Таблицы...';
     const rows = await fetchSheetData();
 
     if (getSceneRows(rows).length === 0) {
+      if (introTimer) clearInterval(introTimer);
       showError('Таблица найдена, но сцены не обнаружены.<br>Проверьте что колонки называются правильно (scene_id, image_url).');
       return;
     }
 
     renderSidebar(rows);
+    renderLotStats(rows);
 
-    document.getElementById('loadingText').textContent = 'Загрузка первой панорамы...';
     const config = buildConfig(rows);
-    initViewer(config);
-    hideLoading();
+    initViewer(config, () => {
+      if (introTimer) clearInterval(introTimer);
+      hideLoading();
+    });
 
   } catch (err) {
+    if (introTimer) clearInterval(introTimer);
     console.error(err);
     showError(`
       Ошибка загрузки тура.<br><br>
       <strong>Причины:</strong><br>
       • Таблица не открыта для публичного доступа<br>
       • Неверный SHEET_ID или имя листа<br>
+      • Google Таблица отвечает слишком медленно, попробуйте обновить страницу<br>
       • В image_url указано имя файла вместо полной ссылки на панораму<br>
+      • Файл панорамы на Google Drive еще загружается или временно недоступен<br>
       • Нет подключения к интернету<br><br>
       <small style="opacity:.6">${err.message}</small>
     `);
