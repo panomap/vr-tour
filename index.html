@@ -1021,7 +1021,7 @@
     width: 220px;
     font-size: 13px;
     line-height: 1.4;
-    pointer-events: none;
+    pointer-events: auto;
     position: absolute;
     z-index: 200;
     opacity: 0;
@@ -1485,6 +1485,8 @@ let lotPolygonsByScene = {};
 let polygonAnimationId = null;
 let activePolygonTooltipKey = null;
 let lastPolygonPointer = { x: 0, y: 0, inside: false };
+let isPolygonTooltipHovered = false;
+let polygonTooltipHideTimer = null;
 let activeLot = null;
 const activeLotStatuses = new Set(['available', 'reserved', 'sold']);
 const urlParams = new URLSearchParams(location.search);
@@ -1869,6 +1871,10 @@ function showPolygonTooltip(lot, points, width, height) {
   const tooltip = document.getElementById('polygonTooltip');
   if (!tooltip) return;
 
+  if (polygonTooltipHideTimer) {
+    clearTimeout(polygonTooltipHideTimer);
+    polygonTooltipHideTimer = null;
+  }
   activePolygonTooltipKey = polygonTooltipKey(lot);
   setPolygonTooltipContent(tooltip, lot);
   tooltip.style.display = 'block';
@@ -1876,12 +1882,25 @@ function showPolygonTooltip(lot, points, width, height) {
   requestAnimationFrame(() => { tooltip.style.opacity = '1'; });
 }
 
-function hidePolygonTooltip() {
+function hidePolygonTooltip(force = false) {
+  if (isPolygonTooltipHovered && !force) return;
   const tooltip = document.getElementById('polygonTooltip');
   activePolygonTooltipKey = null;
   if (!tooltip) return;
+  if (polygonTooltipHideTimer) {
+    clearTimeout(polygonTooltipHideTimer);
+    polygonTooltipHideTimer = null;
+  }
   tooltip.style.opacity = '0';
   tooltip.style.display = 'none';
+}
+
+function scheduleHidePolygonTooltip() {
+  if (polygonTooltipHideTimer) clearTimeout(polygonTooltipHideTimer);
+  polygonTooltipHideTimer = setTimeout(() => {
+    polygonTooltipHideTimer = null;
+    hidePolygonTooltip();
+  }, 160);
 }
 
 function renderLotPolygons() {
@@ -1948,8 +1967,8 @@ function renderLotPolygons() {
 
   if (hoveredLot && hoveredLotPoints) {
     showPolygonTooltip(hoveredLot, hoveredLotPoints, width, height);
-  } else if (lastPolygonPointer.inside && activePolygonTooltipKey) {
-    hidePolygonTooltip();
+  } else if (lastPolygonPointer.inside && activePolygonTooltipKey && !isPolygonTooltipHovered) {
+    scheduleHidePolygonTooltip();
   }
 
   if (!isEditorMode) return;
@@ -2582,6 +2601,22 @@ function updateSavedPolygonsList() {
 // Слушатели кликов для добавления точек полигона
 const viewerWrap = document.querySelector('.viewer-wrap');
 if (viewerWrap) {
+  const polygonTooltipElement = document.getElementById('polygonTooltip');
+  if (polygonTooltipElement) {
+    polygonTooltipElement.addEventListener('mouseenter', () => {
+      isPolygonTooltipHovered = true;
+      if (polygonTooltipHideTimer) {
+        clearTimeout(polygonTooltipHideTimer);
+        polygonTooltipHideTimer = null;
+      }
+    });
+
+    polygonTooltipElement.addEventListener('mouseleave', () => {
+      isPolygonTooltipHovered = false;
+      scheduleHidePolygonTooltip();
+    });
+  }
+
   viewerWrap.addEventListener('mousemove', (e) => {
     const rect = viewerWrap.getBoundingClientRect();
     lastPolygonPointer = {
@@ -2593,7 +2628,8 @@ if (viewerWrap) {
 
   viewerWrap.addEventListener('mouseleave', () => {
     lastPolygonPointer.inside = false;
-    hidePolygonTooltip();
+    isPolygonTooltipHovered = false;
+    hidePolygonTooltip(true);
   });
 
   viewerWrap.addEventListener('mousedown', (e) => {
