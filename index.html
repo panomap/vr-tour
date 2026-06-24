@@ -469,6 +469,162 @@
   .lot-number.lot-reserved,
   .lot-number.lot-sold,
   .lot-number.lot-draft { fill: #ffffff; }
+  .lot-group-marker {
+    pointer-events: auto;
+    cursor: pointer;
+  }
+  .lot-group-marker circle {
+    fill: rgba(255,255,255,0.94);
+    stroke: #4eff02;
+    stroke-width: 3;
+    filter: drop-shadow(0 12px 22px rgba(16,35,22,0.28));
+    transition: transform 0.15s ease, stroke-width 0.15s ease;
+  }
+  .lot-group-marker:hover circle,
+  .lot-group-marker:focus circle {
+    stroke-width: 5;
+  }
+  .lot-group-marker text {
+    pointer-events: none;
+    fill: var(--brand-green-deep);
+    font-weight: 900;
+    font-size: 14px;
+    text-anchor: middle;
+    dominant-baseline: central;
+  }
+  .lot-group-panel {
+    position: absolute;
+    left: 50%;
+    bottom: calc(18px + env(safe-area-inset-bottom, 0px));
+    transform: translateX(-50%);
+    width: min(880px, calc(100vw - 36px));
+    max-height: 220px;
+    background: rgba(255,255,255,0.94);
+    border: 1px solid rgba(33,58,33,0.14);
+    border-radius: 22px;
+    box-shadow: 0 18px 48px rgba(16,35,22,0.26);
+    backdrop-filter: blur(16px);
+    z-index: 80;
+    display: none;
+    pointer-events: auto;
+    overflow: hidden;
+  }
+  .lot-group-panel.open {
+    display: flex;
+    flex-direction: column;
+  }
+  .lot-group-head {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 14px 10px;
+    border-bottom: 1px solid rgba(33,58,33,0.10);
+  }
+  .lot-group-title {
+    min-width: 0;
+    color: var(--brand-green-deep);
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .lot-group-actions {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+  .lot-group-action {
+    min-height: 34px;
+    border-radius: 999px;
+    border: 1px solid rgba(81,135,70,0.34);
+    background: rgba(81,135,70,0.10);
+    color: var(--brand-green-deep);
+    padding: 0 12px;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+  }
+  .lot-group-body {
+    display: flex;
+    gap: 10px;
+    padding: 12px 14px 14px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+  }
+  .lot-group-body::-webkit-scrollbar { height: 4px; }
+  .lot-group-body::-webkit-scrollbar-track { background: transparent; }
+  .lot-group-body::-webkit-scrollbar-thumb { background: rgba(33,58,33,0.22); border-radius: 999px; }
+  .lot-group-card {
+    width: 190px;
+    min-width: 190px;
+    border: 1px solid rgba(33,58,33,0.14);
+    border-radius: 8px;
+    background: rgba(247,244,236,0.74);
+    padding: 11px;
+    text-align: left;
+    cursor: pointer;
+    color: var(--text-primary);
+    transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+  }
+  .lot-group-card:hover,
+  .lot-group-card:focus {
+    background: rgba(81,135,70,0.10);
+    border-color: rgba(81,135,70,0.38);
+    transform: translateY(-1px);
+  }
+  .lot-group-name {
+    color: var(--brand-green-deep);
+    font-size: 13px;
+    font-weight: 900;
+    margin-bottom: 8px;
+  }
+  .lot-group-counts {
+    display: grid;
+    gap: 5px;
+    color: var(--text-secondary);
+    font-size: 12px;
+  }
+  .lot-group-counts div {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
+  }
+  .lot-group-counts strong {
+    color: var(--brand-green-deep);
+  }
+  .lot-group-card-action {
+    display: inline-flex;
+    margin-top: 10px;
+    min-height: 28px;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    background: var(--brand-green);
+    color: #fff;
+    padding: 0 10px;
+    font-size: 10px;
+    font-weight: 900;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+  .lot-group-card.is-lot {
+    width: 168px;
+    min-width: 168px;
+  }
+  .lot-group-price {
+    color: var(--brand-green);
+    font-size: 13px;
+    font-weight: 900;
+    margin-top: 7px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 
   /* Pannellum overrides */
   .pnlm-ui { font-family: inherit; }
@@ -942,6 +1098,7 @@
     .sidebar.open { transform: translateX(0); box-shadow: 8px 0 24px rgba(0,0,0,0.5); }
     body.sidebar-open .counter-badge,
     body.sidebar-open .lot-card-panel,
+    body.sidebar-open .lot-group-panel,
     body.sidebar-open .mobile-actions {
       opacity: 0;
       pointer-events: none;
@@ -992,6 +1149,44 @@
     .lot-action { min-height: 42px; display: inline-flex; align-items: center; justify-content: center; }
     body.lot-card-open .mobile-actions {
       display: none;
+    }
+    body.lot-card-open .lot-group-panel {
+      opacity: 0;
+      pointer-events: none;
+    }
+    .lot-group-panel {
+      left: 12px;
+      right: 12px;
+      bottom: calc(78px + env(safe-area-inset-bottom, 0px));
+      transform: none;
+      width: auto;
+      max-height: 210px;
+      border-radius: 20px;
+      z-index: 250;
+    }
+    .lot-group-head {
+      padding: 10px 12px 8px;
+      gap: 8px;
+    }
+    .lot-group-title {
+      font-size: 12px;
+    }
+    .lot-group-action {
+      min-height: 32px;
+      padding: 0 10px;
+      font-size: 10px;
+    }
+    .lot-group-body {
+      padding: 10px 12px 12px;
+      gap: 8px;
+    }
+    .lot-group-card {
+      width: 164px;
+      min-width: 164px;
+      padding: 10px;
+    }
+    .lot-group-name {
+      font-size: 12px;
     }
     .editor-panel {
       top: auto;
@@ -1475,6 +1670,7 @@
   <main class="viewer-wrap">
     <div id="panorama"></div>
     <svg id="lotPolygonLayer" aria-label="Границы участков"></svg>
+    <section class="lot-group-panel" id="lotGroupPanel" aria-live="polite" aria-label="Группы участков"></section>
 
     <!-- Loading -->
     <div class="loading-screen" id="loadingScreen">
@@ -1595,6 +1791,8 @@ const COL = {
   headingOffset:'heading_offset', // yaw, где в панораме находится север: yaw = bearing + heading_offset
   pitchOffset: 'pitch_offset',   // тонкая поправка pitch для авто-KML участков
   lotRadiusM:  'lot_radius_m',   // максимальная дистанция участков от точки съёмки
+  lotDisplayMode:'lot_display_mode', // groups = сначала показывать группы, а не все участки
+  lotGroupSize:'lot_group_size', // примерное количество участков в одной группе
 };
 
 // ════════════════════════════════════════════════════
@@ -1613,7 +1811,11 @@ const CLIENT_LOTS_SHEET_ID = '1mdAVnkyEWr9FRAd0f_JRygSIuxwFdzOWXnuqEkJERwg';
 const CLIENT_LOTS_GID = '2123234659';
 const LOT_GEOMETRY_URL = 'data/lots.geojson';
 const AUTO_LOT_DEFAULT_RADIUS_M = 1400;
+const LOT_GROUP_DEFAULT_SIZE = 20;
 let lotPolygonsByScene = {};
+let lotGroupsByScene = {};
+let sceneLotDisplayModes = {};
+let activeLotGroupByScene = {};
 let lotBusinessById = new Map();
 let lotGeometryFeatures = [];
 let polygonAnimationId = null;
@@ -1888,6 +2090,36 @@ function visibleLot(lot) {
   return activeLotStatuses.has(statusClass(lot.status));
 }
 
+function lotDisplayMode(row) {
+  return String(row?.[COL.lotDisplayMode] || '').trim().toLowerCase();
+}
+
+function sceneUsesLotGroups(sceneId) {
+  return sceneLotDisplayModes[sceneId] === 'groups';
+}
+
+function activeLotGroup(sceneId = currentSceneId) {
+  const groupId = activeLotGroupByScene[sceneId];
+  if (!groupId) return null;
+  return (lotGroupsByScene[sceneId] || []).find(group => group.id === groupId) || null;
+}
+
+function countLotsByStatus(lots) {
+  return lots.reduce((stats, lot) => {
+    const key = statusClass(lot.status);
+    if (stats[key] !== undefined) stats[key]++;
+    return stats;
+  }, { available: 0, reserved: 0, sold: 0 });
+}
+
+function statusCountsHtml(stats) {
+  return `
+    <div><span><span class="status-dot"></span> В продаже</span><strong>${stats.available}</strong></div>
+    <div><span><span class="status-dot reserved"></span> Бронь</span><strong>${stats.reserved}</strong></div>
+    <div><span><span class="status-dot sold"></span> Продано</span><strong>${stats.sold}</strong></div>
+  `;
+}
+
 function toRad(deg) {
   return deg * Math.PI / 180;
 }
@@ -1988,7 +2220,9 @@ function lotFromGeometryFeature(feature, sceneMeta) {
   if (!Array.isArray(ring) || ring.length < 4) return null;
 
   const centroid = polygonCentroidLngLat(ring);
-  if (distanceMeters(sceneMeta.lat, sceneMeta.lng, centroid.lat, centroid.lng) > sceneMeta.radius) return null;
+  const centroidDistance = distanceMeters(sceneMeta.lat, sceneMeta.lng, centroid.lat, centroid.lng);
+  const centroidBearing = bearingDegrees(sceneMeta.lat, sceneMeta.lng, centroid.lat, centroid.lng);
+  if (centroidDistance > sceneMeta.radius) return null;
 
   const points = ring
     .slice(0, -1)
@@ -2005,6 +2239,9 @@ function lotFromGeometryFeature(feature, sceneMeta) {
     text: business.address || props.address_ru || '',
     link: '',
     points,
+    groupSortYaw: normalizeYaw(centroidBearing + sceneMeta.headingOffset),
+    groupSortDistance: centroidDistance,
+    groupCenter: geoCoordToPanoramaPoint([centroid.lng, centroid.lat], sceneMeta),
   };
 }
 
@@ -2022,6 +2259,88 @@ function buildAutoLotPolygons(sceneRows) {
     if (!autoLots.length) return;
     if (!lotPolygonsByScene[sceneId]) lotPolygonsByScene[sceneId] = [];
     lotPolygonsByScene[sceneId].push(...autoLots);
+  });
+}
+
+function averageLotPoint(lots) {
+  let sin = 0;
+  let cos = 0;
+  let pitch = 0;
+  let count = 0;
+
+  lots.forEach(lot => {
+    const point = lot.groupCenter || polygonYawPitchCenter(lot.points);
+    if (!point || !Number.isFinite(point.yaw) || !Number.isFinite(point.pitch)) return;
+    sin += Math.sin(toRad(point.yaw));
+    cos += Math.cos(toRad(point.yaw));
+    pitch += point.pitch;
+    count++;
+  });
+
+  if (!count) return { yaw: 0, pitch: 0 };
+  return {
+    yaw: normalizeYaw(toDeg(Math.atan2(sin / count, cos / count))),
+    pitch: pitch / count,
+  };
+}
+
+function polygonYawPitchCenter(points) {
+  if (!Array.isArray(points) || !points.length) return null;
+  const total = points.reduce((acc, point) => {
+    acc.yaw += point.yaw;
+    acc.pitch += point.pitch;
+    return acc;
+  }, { yaw: 0, pitch: 0 });
+  return {
+    yaw: total.yaw / points.length,
+    pitch: total.pitch / points.length,
+  };
+}
+
+function sortLotsForGrouping(lots) {
+  return [...lots].sort((a, b) => {
+    const yawA = Number.isFinite(a.groupSortYaw) ? a.groupSortYaw : polygonYawPitchCenter(a.points)?.yaw || 0;
+    const yawB = Number.isFinite(b.groupSortYaw) ? b.groupSortYaw : polygonYawPitchCenter(b.points)?.yaw || 0;
+    if (Math.abs(yawA - yawB) > 0.001) return yawA - yawB;
+    const distA = Number.isFinite(a.groupSortDistance) ? a.groupSortDistance : 0;
+    const distB = Number.isFinite(b.groupSortDistance) ? b.groupSortDistance : 0;
+    return distA - distB;
+  });
+}
+
+function buildLotGroupsForScenes(sceneRows) {
+  lotGroupsByScene = {};
+  sceneLotDisplayModes = {};
+
+  sceneRows.forEach(row => {
+    const sceneId = row[COL.id];
+    const mode = lotDisplayMode(row);
+    sceneLotDisplayModes[sceneId] = mode;
+    if (mode !== 'groups') return;
+
+    const lots = sortLotsForGrouping(lotPolygonsByScene[sceneId] || []);
+    if (!lots.length) return;
+
+    const requestedSize = parseNumberValue(row[COL.lotGroupSize]);
+    const groupSize = Number.isFinite(requestedSize) && requestedSize > 0
+      ? Math.max(5, Math.round(requestedSize))
+      : LOT_GROUP_DEFAULT_SIZE;
+    const groups = [];
+
+    for (let i = 0; i < lots.length; i += groupSize) {
+      const groupLots = lots.slice(i, i + groupSize);
+      const number = groups.length + 1;
+      groups.push({
+        id: `${sceneId}-lot-group-${number}`,
+        number,
+        title: `Группа ${number}`,
+        lots: groupLots,
+        stats: countLotsByStatus(groupLots),
+        center: averageLotPoint(groupLots),
+      });
+    }
+
+    lotGroupsByScene[sceneId] = groups;
   });
 }
 
@@ -2092,6 +2411,92 @@ function closeLotCard() {
   activeLot = null;
   document.getElementById('lotCardPanel')?.classList.remove('open');
   document.body.classList.remove('lot-card-open');
+}
+
+function lotsForCurrentRender(sceneId = currentSceneId) {
+  if (!sceneId) return [];
+  const allLots = lotPolygonsByScene[sceneId] || [];
+  if (!sceneUsesLotGroups(sceneId)) return allLots;
+  const group = activeLotGroup(sceneId);
+  return group ? group.lots : [];
+}
+
+function openLotGroup(groupId) {
+  if (!currentSceneId) return;
+  activeLotGroupByScene[currentSceneId] = groupId;
+  closeLotCard();
+  hidePolygonTooltip();
+  renderLotGroupPanel();
+  renderLotPolygons();
+}
+
+function closeLotGroup() {
+  if (!currentSceneId) return;
+  delete activeLotGroupByScene[currentSceneId];
+  closeLotCard();
+  hidePolygonTooltip();
+  renderLotGroupPanel();
+  renderLotPolygons();
+}
+
+function renderLotGroupPanel() {
+  const panel = document.getElementById('lotGroupPanel');
+  if (!panel) return;
+
+  const groups = lotGroupsByScene[currentSceneId] || [];
+  if (!sceneUsesLotGroups(currentSceneId) || !groups.length) {
+    panel.classList.remove('open');
+    panel.innerHTML = '';
+    return;
+  }
+
+  const group = activeLotGroup();
+  const title = group ? `${group.title}: ${group.lots.length} участков` : `Группы участков: ${groups.length}`;
+  const backButton = group
+    ? '<button class="lot-group-action" type="button" data-lot-group-back>Все группы</button>'
+    : '';
+
+  const bodyHtml = group
+    ? group.lots.filter(visibleLot).map((lot, index) => {
+        const status = statusInfo(lot.status);
+        return `
+          <button class="lot-group-card is-lot" type="button" data-lot-id="${escapeHTML(lot.id)}">
+            <div class="lot-group-name">${index + 1}. ${escapeHTML(lot.title || lot.id)}</div>
+            <div class="lot-group-counts">
+              <div><span>Статус</span><strong>${status.label}</strong></div>
+              ${lot.area ? `<div><span>Площадь</span><strong>${escapeHTML(lot.area)}</strong></div>` : ''}
+            </div>
+            ${lot.price ? `<div class="lot-group-price">${escapeHTML(lot.price)}</div>` : ''}
+          </button>
+        `;
+      }).join('')
+    : groups.filter(groupItem => groupItem.lots.some(visibleLot)).map(groupItem => `
+        <button class="lot-group-card" type="button" data-lot-group="${escapeHTML(groupItem.id)}">
+          <div class="lot-group-name">${escapeHTML(groupItem.title)}</div>
+          <div class="lot-group-counts">${statusCountsHtml(groupItem.stats)}</div>
+          <span class="lot-group-card-action">Развернуть</span>
+        </button>
+      `).join('');
+
+  panel.innerHTML = `
+    <div class="lot-group-head">
+      <div class="lot-group-title">${escapeHTML(title)}</div>
+      <div class="lot-group-actions">${backButton}</div>
+    </div>
+    <div class="lot-group-body">${bodyHtml}</div>
+  `;
+  panel.classList.add('open');
+
+  panel.querySelectorAll('[data-lot-group]').forEach(button => {
+    onActivate(button, () => openLotGroup(button.dataset.lotGroup));
+  });
+  onActivate(panel.querySelector('[data-lot-group-back]'), closeLotGroup);
+  panel.querySelectorAll('[data-lot-id]').forEach(button => {
+    onActivate(button, () => {
+      const selected = group?.lots.find(lot => lot.id === button.dataset.lotId);
+      if (selected) openLotCard(selected);
+    });
+  });
 }
 
 function parseLotPoints(value) {
@@ -2294,7 +2699,7 @@ function keepPolygonTooltipOpen() {
 }
 
 function lotUnderScreenPoint(point, width, height) {
-  const lots = (lotPolygonsByScene[currentSceneId] || []).filter(visibleLot);
+  const lots = lotsForCurrentRender(currentSceneId).filter(visibleLot);
   for (const lot of lots) {
     const screenPoints = lot.points.map(lotPoint => projectPoint(lotPoint, width, height));
     const validPoints = screenPoints.filter(Boolean);
@@ -2305,18 +2710,56 @@ function lotUnderScreenPoint(point, width, height) {
   return null;
 }
 
+function renderLotGroupMarkers(layer, width, height) {
+  const groups = (lotGroupsByScene[currentSceneId] || []).filter(group => group.lots.some(visibleLot));
+  groups.forEach(group => {
+    const center = projectPoint(group.center, width, height);
+    if (!center) return;
+
+    const marker = document.createElementNS('http://www.w3.org/2000/svg', 'g');
+    marker.setAttribute('class', 'lot-group-marker');
+    marker.setAttribute('tabindex', '0');
+    marker.setAttribute('role', 'button');
+    marker.setAttribute('aria-label', `${group.title}: ${group.lots.length} участков`);
+    marker.setAttribute('transform', `translate(${center.x.toFixed(1)} ${center.y.toFixed(1)})`);
+
+    const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+    circle.setAttribute('r', '24');
+    marker.appendChild(circle);
+
+    const number = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    number.textContent = String(group.number);
+    marker.appendChild(number);
+
+    onActivate(marker, () => openLotGroup(group.id));
+    marker.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') openLotGroup(group.id);
+    });
+    layer.appendChild(marker);
+  });
+}
+
 function renderLotPolygons() {
   if (!viewer || !currentSceneId) return;
   const layer = document.getElementById('lotPolygonLayer');
   const wrap = document.getElementById('panorama');
   const tooltip = document.getElementById('polygonTooltip');
-  const lots = (lotPolygonsByScene[currentSceneId] || []).filter(visibleLot);
+  const groupedScene = sceneUsesLotGroups(currentSceneId);
+  const group = activeLotGroup(currentSceneId);
+  const lots = lotsForCurrentRender(currentSceneId).filter(visibleLot);
   const width = wrap.clientWidth;
   const height = wrap.clientHeight;
   let hoveredLot = null;
   let hoveredLotPoints = null;
   layer.setAttribute('viewBox', `0 0 ${width} ${height}`);
   layer.innerHTML = '';
+
+  if (groupedScene && !group) {
+    isLotPolygonHovered = false;
+    hidePolygonTooltip();
+    renderLotGroupMarkers(layer, width, height);
+    if (!isEditorMode) return;
+  }
 
   // 1. Отображение сохраненных в таблице участков
   lots.forEach((lot, index) => {
@@ -2451,6 +2894,8 @@ function buildConfig(rows) {
   const sceneRows = getSceneRows(rows);
   const sceneOrder = sceneRows.map(row => row[COL.id]);
   lotPolygonsByScene = {};
+  lotGroupsByScene = {};
+  sceneLotDisplayModes = {};
 
   const sceneMap = {};
   sceneRows.forEach(row => {
@@ -2494,6 +2939,7 @@ function buildConfig(rows) {
   });
 
   buildAutoLotPolygons(sceneRows);
+  buildLotGroupsForScenes(sceneRows);
 
   sceneOrder.forEach(id => {
     const { row, hotspots } = sceneMap[id];
@@ -2605,6 +3051,7 @@ document.querySelectorAll('[data-status-filter]').forEach(button => {
       button.classList.add('is-active');
     }
     if (activeLot && !visibleLot(activeLot)) closeLotCard();
+    renderLotGroupPanel();
     renderLotPolygons();
   });
 });
@@ -2618,6 +3065,7 @@ function loadScene(sceneId) {
   currentSceneId = sceneId;
   updateSidebarActive(sceneId);
   updateOverlay(sceneId);
+  renderLotGroupPanel();
   renderLotPolygons();
   updateSavedPolygonsList();
   // Закрываем сайдбар на мобильном
@@ -2720,6 +3168,7 @@ function initViewer(config, onFirstLoad) {
   currentSceneId = firstId;
   updateSidebarActive(firstId);
   updateOverlay(firstId);
+  renderLotGroupPanel();
   startPolygonRenderer();
   updateSavedPolygonsList();
 
@@ -2737,6 +3186,7 @@ function initViewer(config, onFirstLoad) {
     currentSceneId = id;
     updateSidebarActive(id);
     updateOverlay(id);
+    renderLotGroupPanel();
     renderLotPolygons();
     updateSavedPolygonsList();
   });
@@ -3080,6 +3530,7 @@ const viewerWrap = document.querySelector('.viewer-wrap');
 if (viewerWrap) {
   function isEditorPointerIgnored(event) {
     return Boolean(event.target.closest('#editorPanel')
+      || event.target.closest('#lotGroupPanel')
       || event.target.closest('.map-button')
       || event.target.closest('.mobile-actions')
       || event.target.closest('.coords-badge')
