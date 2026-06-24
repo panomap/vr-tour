@@ -471,53 +471,24 @@
   .pnlm-ui { font-family: inherit; }
   .pnlm-hot-spot-debug-indicator { display: none !important; }
   .pnlm-hotspot-base.pnlm-scene {
-    width: 46px !important;
-    height: 46px !important;
-    border: 1px solid rgba(255,255,255,0.94);
-    border-radius: 50%;
-    background:
-      radial-gradient(circle at 50% 46%, rgba(255,255,255,0.96) 0 22%, transparent 23%),
-      linear-gradient(145deg, #7fbf72, #3f7d39);
-    box-shadow:
-      0 0 0 7px rgba(81,135,70,0.18),
-      0 14px 34px rgba(16,35,22,0.34),
-      inset 0 1px 0 rgba(255,255,255,0.42);
+    width: 58px !important;
+    height: 86px !important;
+    border: 0 !important;
+    background: url('hotspot-marker.png') center / contain no-repeat !important;
+    box-shadow: none !important;
     cursor: pointer;
-    transform-origin: center;
-    transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+    transform-origin: center bottom;
+    filter: drop-shadow(0 14px 18px rgba(16,35,22,0.34));
+    transition: transform 0.18s ease, filter 0.18s ease;
   }
-  .pnlm-hotspot-base.pnlm-scene::before {
-    content: '';
-    position: absolute;
-    inset: -10px;
-    border-radius: 50%;
-    border: 1px solid rgba(255,255,255,0.36);
-    background: rgba(81,135,70,0.10);
-    animation: sceneHotspotPulse 2.4s ease-out infinite;
-  }
+  .pnlm-hotspot-base.pnlm-scene::before,
   .pnlm-hotspot-base.pnlm-scene::after {
-    content: '';
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 13px;
-    height: 13px;
-    border-top: 3px solid var(--brand-green-deep);
-    border-right: 3px solid var(--brand-green-deep);
-    transform: translate(-58%, -50%) rotate(45deg);
+    content: none !important;
   }
   .pnlm-hotspot-base.pnlm-scene:hover,
   .pnlm-hotspot-base.pnlm-scene:focus {
-    border-color: white;
-    transform: scale(1.12);
-    box-shadow:
-      0 0 0 10px rgba(81,135,70,0.20),
-      0 18px 42px rgba(16,35,22,0.40),
-      inset 0 1px 0 rgba(255,255,255,0.54);
-  }
-  @keyframes sceneHotspotPulse {
-    0% { opacity: 0.8; transform: scale(0.76); }
-    70%, 100% { opacity: 0; transform: scale(1.28); }
+    transform: translateY(-5px) scale(1.08);
+    filter: drop-shadow(0 18px 24px rgba(16,35,22,0.42));
   }
   .lot-hotspot {
     width: 28px !important;
