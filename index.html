@@ -929,9 +929,50 @@
     #btnFullscreen { display: none; }
     .sidebar-brand img { height: 72px; }
     .counter-badge { top: 82px; right: 12px; }
-    .coords-badge { top: 118px; right: 12px; max-width: calc(100vw - 24px); }
+    .coords-badge {
+      top: 82px;
+      left: 12px;
+      right: auto;
+      max-width: calc(100vw - 24px);
+      z-index: 260;
+    }
     .map-button { display: none; }
     .lot-card-panel { left: 12px; right: 12px; top: auto; bottom: 86px; width: auto; z-index: 265; }
+    .editor-panel {
+      top: auto;
+      left: 10px;
+      right: 10px;
+      bottom: calc(10px + env(safe-area-inset-bottom, 0px));
+      width: auto;
+      max-height: min(58dvh, 440px);
+      border-left: 0;
+      border: 1px solid rgba(33,58,33,0.14);
+      border-radius: 24px;
+      box-shadow: 0 -18px 54px rgba(16,35,22,0.28);
+      z-index: 300;
+      transform: translateY(calc(100% + 24px));
+      overflow: hidden;
+    }
+    .editor-panel.open {
+      transform: translateY(0);
+    }
+    .editor-header {
+      padding: 12px 14px;
+    }
+    .editor-body {
+      padding: 12px 14px 14px;
+      gap: 10px;
+    }
+    .editor-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+    }
+    .editor-controls .btn-primary {
+      grid-column: 1 / -1;
+    }
+    body.editor-mode .mobile-actions {
+      display: none;
+    }
     .mobile-actions {
       position: fixed;
       right: 14px;
