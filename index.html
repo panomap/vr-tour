@@ -320,7 +320,7 @@
     vertical-align: middle;
   }
   .status-dot.reserved { background: #ffb000; }
-  .status-dot.sold { background: #ff1f1f; }
+  .status-dot.sold { background: #ff000a; }
   .lot-stats {
     display: grid;
     gap: 6px;
@@ -427,28 +427,28 @@
   .lot-polygon {
     pointer-events: auto;
     cursor: pointer;
-    stroke: #19f05a;
-    stroke-width: 4;
-    stroke-opacity: 0.96;
+    stroke: #4eff02;
+    stroke-width: 2.6;
+    stroke-opacity: 1;
     vector-effect: non-scaling-stroke;
-    fill: rgba(25,240,90,0.10);
-    filter: drop-shadow(0 4px 10px rgba(25,240,90,0.24));
+    fill: rgba(255,255,255,0);
+    filter: drop-shadow(0 3px 8px rgba(78,255,2,0.22));
     transition: fill 0.15s, stroke-width 0.15s, stroke-opacity 0.15s;
   }
   .lot-polygon.is-hovered,
   .lot-polygon:hover,
   .lot-polygon:focus {
-    fill: rgba(25,240,90,0.30);
+    fill: rgba(30,181,3,0.40);
     stroke-width: 4;
   }
   .lot-polygon.lot-reserved { stroke: #ffb000; fill: rgba(255,176,0,0.12); }
   .lot-polygon.lot-reserved.is-hovered,
   .lot-polygon.lot-reserved:hover,
   .lot-polygon.lot-reserved:focus { fill: rgba(255,176,0,0.30); }
-  .lot-polygon.lot-sold { stroke: #ff1f1f; fill: rgba(255,31,31,0.12); }
+  .lot-polygon.lot-sold { stroke: #ff000a; fill: rgba(255,0,10,0.10); }
   .lot-polygon.lot-sold.is-hovered,
   .lot-polygon.lot-sold:hover,
-  .lot-polygon.lot-sold:focus { fill: rgba(255,31,31,0.32); }
+  .lot-polygon.lot-sold:focus { fill: rgba(255,0,10,0.36); }
   .lot-number {
     pointer-events: none;
     paint-order: stroke;
@@ -462,9 +462,9 @@
     dominant-baseline: central;
     filter: drop-shadow(0 3px 8px rgba(0,0,0,0.45));
   }
-  .lot-number.lot-available { fill: #19f05a; }
+  .lot-number.lot-available { fill: #4eff02; }
   .lot-number.lot-reserved { fill: #d98f00; }
-  .lot-number.lot-sold { fill: #e60000; }
+  .lot-number.lot-sold { fill: #ff000a; }
   .lot-number.lot-draft { fill: #4d6049; }
 
   /* Pannellum overrides */
@@ -1139,9 +1139,9 @@
     font-size: 11px;
     font-weight: 600;
   }
-  .polygon-tooltip-status.available { background: rgba(25,240,90,0.16); color: #0faa3e; }
+  .polygon-tooltip-status.available { background: rgba(78,255,2,0.16); color: #1eb503; }
   .polygon-tooltip-status.reserved { background: rgba(255,176,0,0.18); color: #b37300; }
-  .polygon-tooltip-status.sold { background: rgba(255,31,31,0.16); color: #d90000; }
+  .polygon-tooltip-status.sold { background: rgba(255,0,10,0.16); color: #ff000a; }
 
   /* ── EDITOR PANEL & CONTROLS ── */
   .editor-panel {
