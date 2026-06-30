@@ -492,6 +492,42 @@
     text-anchor: middle;
     dominant-baseline: central;
   }
+  .sector-polygon {
+    pointer-events: auto;
+    cursor: pointer;
+    fill: rgba(81,135,70,0.18);
+    stroke: rgba(255,255,255,0.92);
+    stroke-width: 2.5;
+    stroke-dasharray: 8 6;
+    vector-effect: non-scaling-stroke;
+    filter: drop-shadow(0 12px 24px rgba(16,35,22,0.30));
+    transition: fill 0.15s ease, stroke-width 0.15s ease;
+  }
+  .sector-polygon:hover,
+  .sector-polygon:focus {
+    fill: rgba(81,135,70,0.36);
+    stroke-width: 4;
+    outline: none;
+  }
+  .sector-label-bg {
+    pointer-events: none;
+    fill: rgba(255,255,255,0.94);
+    stroke: rgba(33,58,33,0.14);
+    stroke-width: 1;
+    filter: drop-shadow(0 8px 18px rgba(16,35,22,0.24));
+  }
+  .sector-label {
+    pointer-events: none;
+    fill: var(--brand-green-deep);
+    font-size: 13px;
+    font-weight: 900;
+    text-anchor: middle;
+    dominant-baseline: central;
+    paint-order: stroke;
+    stroke: rgba(255,255,255,0.9);
+    stroke-width: 3px;
+    stroke-linejoin: round;
+  }
   .lot-group-panel {
     position: absolute;
     left: 50%;
@@ -1941,6 +1977,18 @@ const CLIENT_LOTS_GID = '2123234659';
 const LOT_GEOMETRY_URL = 'data/lots.geojson';
 const AUTO_LOT_DEFAULT_RADIUS_M = 1400;
 const LOT_GROUP_DEFAULT_SIZE = 20;
+const OVERVIEW_SCENE_ID = 'karajar-20260630-1';
+const SCENE_START_VIEWS = {
+  [OVERVIEW_SCENE_ID]: { yaw: 0, pitch: -35, hfov: 105 },
+};
+const OVERVIEW_SECTORS = [
+  { title: 'Сектор 1', sceneId: 'karajar-20260630-2' },
+  { title: 'Сектор 2', sceneId: 'karajar-20260630-3' },
+  { title: 'Сектор 3', sceneId: 'karajar-20260630-4' },
+  { title: 'Сектор 4', sceneId: 'karajar-20260630-5' },
+  { title: 'Сектор 5', sceneId: 'karajar-20260630-6' },
+  { title: 'Сектор 6', sceneId: 'karajar-20260630-8' },
+];
 let lotPolygonsByScene = {};
 let lotGroupsByScene = {};
 let sceneLotDisplayModes = {};
@@ -2896,6 +2944,71 @@ function renderLotGroupMarkers(layer, width, height) {
   });
 }
 
+function rowForScene(sceneId) {
+  return allScenes.find(row => row[COL.id] === sceneId) || null;
+}
+
+function renderOverviewSectors(layer, width, height) {
+  if (currentSceneId !== OVERVIEW_SCENE_ID) return;
+
+  const overviewRow = rowForScene(OVERVIEW_SCENE_ID);
+  const overviewMeta = sceneAutoLotMeta(overviewRow);
+  if (!overviewMeta) return;
+
+  OVERVIEW_SECTORS.forEach((sector, index) => {
+    const targetRow = rowForScene(sector.sceneId);
+    const targetMeta = sceneAutoLotMeta(targetRow);
+    if (!targetMeta) return;
+
+    const bearing = bearingDegrees(overviewMeta.lat, overviewMeta.lng, targetMeta.lat, targetMeta.lng);
+    const centerYaw = normalizeYaw(bearing + overviewMeta.headingOffset);
+    const distance = distanceMeters(overviewMeta.lat, overviewMeta.lng, targetMeta.lat, targetMeta.lng);
+    const halfYaw = Math.max(12, Math.min(26, 10 + distance / 80));
+    const centerPitch = toDeg(Math.atan2(-overviewMeta.altitude, Math.max(1, distance))) + overviewMeta.pitchOffset;
+    const topPitch = Math.min(-4, centerPitch + 12);
+    const bottomPitch = Math.max(-68, centerPitch - 24);
+    const points = [
+      { yaw: normalizeYaw(centerYaw - halfYaw), pitch: topPitch },
+      { yaw: normalizeYaw(centerYaw + halfYaw), pitch: topPitch },
+      { yaw: normalizeYaw(centerYaw + halfYaw * 0.74), pitch: bottomPitch },
+      { yaw: normalizeYaw(centerYaw - halfYaw * 0.74), pitch: bottomPitch },
+    ];
+    const screenPoints = points.map(point => projectPoint(point, width, height)).filter(Boolean);
+    if (screenPoints.length < 3) return;
+
+    const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
+    polygon.setAttribute('class', 'sector-polygon');
+    polygon.setAttribute('points', screenPoints.map(point => `${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(' '));
+    polygon.setAttribute('tabindex', '0');
+    polygon.setAttribute('role', 'button');
+    polygon.setAttribute('aria-label', `${sector.title}. Перейти к панораме ${targetRow[COL.title] || sector.sceneId}`);
+    onActivate(polygon, () => loadScene(sector.sceneId));
+    polygon.addEventListener('keydown', event => {
+      if (event.key === 'Enter' || event.key === ' ') loadScene(sector.sceneId);
+    });
+    layer.appendChild(polygon);
+
+    const labelPoint = projectPoint({ yaw: centerYaw, pitch: (topPitch + bottomPitch) / 2 }, width, height);
+    if (!labelPoint) return;
+
+    const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    labelBg.setAttribute('class', 'sector-label-bg');
+    labelBg.setAttribute('x', (labelPoint.x - 44).toFixed(1));
+    labelBg.setAttribute('y', (labelPoint.y - 16).toFixed(1));
+    labelBg.setAttribute('width', '88');
+    labelBg.setAttribute('height', '32');
+    labelBg.setAttribute('rx', '16');
+    layer.appendChild(labelBg);
+
+    const label = document.createElementNS('http://www.w3.org/2000/svg', 'text');
+    label.setAttribute('class', 'sector-label');
+    label.setAttribute('x', labelPoint.x.toFixed(1));
+    label.setAttribute('y', labelPoint.y.toFixed(1));
+    label.textContent = sector.title || `Сектор ${index + 1}`;
+    layer.appendChild(label);
+  });
+}
+
 function renderLotPolygons() {
   if (!viewer || !currentSceneId) return;
   const layer = document.getElementById('lotPolygonLayer');
@@ -2910,6 +3023,8 @@ function renderLotPolygons() {
   let hoveredLotPoints = null;
   layer.setAttribute('viewBox', `0 0 ${width} ${height}`);
   layer.innerHTML = '';
+
+  renderOverviewSectors(layer, width, height);
 
   if (groupedScene && !group) {
     isLotPolygonHovered = false;
@@ -3105,6 +3220,7 @@ function buildConfig(rows) {
       panorama: normalizeImageUrl(row[COL.imageUrl]),
       title: escapeHTML(row[COL.title] || id),
       hotSpots: hotspots,
+      ...(SCENE_START_VIEWS[id] || {}),
     };
   });
 
@@ -3848,22 +3964,14 @@ function startIntroMessages() {
 // ══ СТАРТ ══
 (async function main() {
   const introTimer = startIntroMessages();
-  if (!SHEET_ID || SHEET_ID === 'ВАШ_ID_ТАБЛИЦЫ_ЗДЕСЬ') {
-    if (introTimer) clearInterval(introTimer);
-    showError('Укажите SHEET_ID в начале файла. Скопируйте ID из ссылки Google Таблицы и убедитесь, что таблица открыта для просмотра по ссылке.');
-    return;
-  }
 
   try {
-    const rows = [
-      ...(await fetchSheetData()),
-      ...LOCAL_TOUR_ROWS,
-    ];
+    const rows = LOCAL_TOUR_ROWS;
     await loadAutoLotSources();
 
     if (getSceneRows(rows).length === 0) {
       if (introTimer) clearInterval(introTimer);
-      showError('Таблица найдена, но сцены не обнаружены. Проверьте, что колонки называются правильно: scene_id, image_url.');
+      showError('Сцены не обнаружены. Проверьте локальные настройки LOCAL_TOUR_ROWS.');
       return;
     }
 
