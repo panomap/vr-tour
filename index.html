@@ -1843,7 +1843,7 @@ const LOCAL_TOUR_ROWS = [
     [COL.headingOffset]: '0',
     [COL.pitchOffset]: '0',
     [COL.lotRadiusM]: '1600',
-    [COL.lotDisplayMode]: 'groups',
+    [COL.lotDisplayMode]: 'sectors',
     [COL.lotGroupSize]: '20',
   },
   {
@@ -1944,20 +1944,6 @@ const LOCAL_TOUR_ROWS = [
     [COL.lotDisplayMode]: 'groups',
     [COL.lotGroupSize]: '20',
   },
-  { [COL.id]: 'karajar-20260630-1', [COL.hotspotTo]: 'karajar-20260630-6', [COL.hotspotText]: 'Каражар 30.06 - 6', [COL.yaw]: '-135', [COL.pitch]: '-4' },
-  { [COL.id]: 'karajar-20260630-2', [COL.hotspotTo]: 'karajar-20260630-4', [COL.hotspotText]: 'Каражар 30.06 - 4', [COL.yaw]: '25', [COL.pitch]: '-4' },
-  { [COL.id]: 'karajar-20260630-2', [COL.hotspotTo]: 'karajar-20260630-3', [COL.hotspotText]: 'Каражар 30.06 - 3', [COL.yaw]: '-115', [COL.pitch]: '-4' },
-  { [COL.id]: 'karajar-20260630-3', [COL.hotspotTo]: 'karajar-20260630-6', [COL.hotspotText]: 'Каражар 30.06 - 6', [COL.yaw]: '130', [COL.pitch]: '-4' },
-  { [COL.id]: 'karajar-20260630-3', [COL.hotspotTo]: 'karajar-20260630-2', [COL.hotspotText]: 'Каражар 30.06 - 2', [COL.yaw]: '25', [COL.pitch]: '-4' },
-  { [COL.id]: 'karajar-20260630-3', [COL.hotspotTo]: 'karajar-20260630-8', [COL.hotspotText]: 'Каражар 30.06 - 8', [COL.yaw]: '-100', [COL.pitch]: '-4' },
-  { [COL.id]: 'karajar-20260630-4', [COL.hotspotTo]: 'karajar-20260630-2', [COL.hotspotText]: 'Каражар 30.06 - 2', [COL.yaw]: '-155', [COL.pitch]: '-4' },
-  { [COL.id]: 'karajar-20260630-5', [COL.hotspotTo]: 'karajar-20260630-8', [COL.hotspotText]: 'Каражар 30.06 - 8', [COL.yaw]: '105', [COL.pitch]: '-4' },
-  { [COL.id]: 'karajar-20260630-5', [COL.hotspotTo]: 'karajar-20260630-7', [COL.hotspotText]: 'Каражар 30.06 - 7', [COL.yaw]: '-145', [COL.pitch]: '-4' },
-  { [COL.id]: 'karajar-20260630-6', [COL.hotspotTo]: 'karajar-20260630-1', [COL.hotspotText]: 'Каражар 30.06 - 1', [COL.yaw]: '70', [COL.pitch]: '-4' },
-  { [COL.id]: 'karajar-20260630-6', [COL.hotspotTo]: 'karajar-20260630-3', [COL.hotspotText]: 'Каражар 30.06 - 3', [COL.yaw]: '-50', [COL.pitch]: '-4' },
-  { [COL.id]: 'karajar-20260630-7', [COL.hotspotTo]: 'karajar-20260630-5', [COL.hotspotText]: 'Каражар 30.06 - 5', [COL.yaw]: '35', [COL.pitch]: '-4' },
-  { [COL.id]: 'karajar-20260630-8', [COL.hotspotTo]: 'karajar-20260630-3', [COL.hotspotText]: 'Каражар 30.06 - 3', [COL.yaw]: '95', [COL.pitch]: '-4' },
-  { [COL.id]: 'karajar-20260630-8', [COL.hotspotTo]: 'karajar-20260630-5', [COL.hotspotText]: 'Каражар 30.06 - 5', [COL.yaw]: '-130', [COL.pitch]: '-4' },
 ];
 
 // ════════════════════════════════════════════════════
@@ -1979,16 +1965,18 @@ const AUTO_LOT_DEFAULT_RADIUS_M = 1400;
 const LOT_GROUP_DEFAULT_SIZE = 20;
 const OVERVIEW_SCENE_ID = 'karajar-20260630-1';
 const SCENE_START_VIEWS = {
-  [OVERVIEW_SCENE_ID]: { yaw: 0, pitch: -35, hfov: 105 },
+  [OVERVIEW_SCENE_ID]: { yaw: 0, pitch: -35, hfov: 120 },
 };
 const OVERVIEW_SECTORS = [
-  { title: 'Сектор 1', sceneId: 'karajar-20260630-2' },
-  { title: 'Сектор 2', sceneId: 'karajar-20260630-3' },
-  { title: 'Сектор 3', sceneId: 'karajar-20260630-4' },
-  { title: 'Сектор 4', sceneId: 'karajar-20260630-5' },
-  { title: 'Сектор 5', sceneId: 'karajar-20260630-6' },
-  { title: 'Сектор 6', sceneId: 'karajar-20260630-8' },
+  { title: 'Сектор 1', sceneId: 'karajar-20260630-2', yawStart: -60, yawEnd: -40 },
+  { title: 'Сектор 2', sceneId: 'karajar-20260630-3', yawStart: -40, yawEnd: -20 },
+  { title: 'Сектор 3', sceneId: 'karajar-20260630-4', yawStart: -20, yawEnd: 0 },
+  { title: 'Сектор 4', sceneId: 'karajar-20260630-5', yawStart: 0, yawEnd: 20 },
+  { title: 'Сектор 5', sceneId: 'karajar-20260630-6', yawStart: 20, yawEnd: 40 },
+  { title: 'Сектор 6', sceneId: 'karajar-20260630-8', yawStart: 40, yawEnd: 60 },
 ];
+const OVERVIEW_SECTOR_TOP_PITCH = -12;
+const OVERVIEW_SECTOR_BOTTOM_PITCH = -68;
 let lotPolygonsByScene = {};
 let lotGroupsByScene = {};
 let sceneLotDisplayModes = {};
@@ -2300,6 +2288,7 @@ function lotDisplayMode(row) {
 }
 
 function sceneUsesLotGroups(sceneId) {
+  if (sceneId === OVERVIEW_SCENE_ID) return false;
   return sceneLotDisplayModes[sceneId] === 'groups';
 }
 
@@ -2620,6 +2609,7 @@ function closeLotCard() {
 
 function lotsForCurrentRender(sceneId = currentSceneId) {
   if (!sceneId) return [];
+  if (sceneId === OVERVIEW_SCENE_ID) return [];
   const allLots = lotPolygonsByScene[sceneId] || [];
   if (!sceneUsesLotGroups(sceneId)) return allLots;
   const group = activeLotGroup(sceneId);
@@ -2647,6 +2637,12 @@ function closeLotGroup() {
 function renderLotGroupPanel() {
   const panel = document.getElementById('lotGroupPanel');
   if (!panel) return;
+
+  if (currentSceneId === OVERVIEW_SCENE_ID) {
+    panel.classList.remove('open');
+    panel.innerHTML = '';
+    return;
+  }
 
   const groups = lotGroupsByScene[currentSceneId] || [];
   if (!sceneUsesLotGroups(currentSceneId) || !groups.length) {
@@ -2951,27 +2947,16 @@ function rowForScene(sceneId) {
 function renderOverviewSectors(layer, width, height) {
   if (currentSceneId !== OVERVIEW_SCENE_ID) return;
 
-  const overviewRow = rowForScene(OVERVIEW_SCENE_ID);
-  const overviewMeta = sceneAutoLotMeta(overviewRow);
-  if (!overviewMeta) return;
-
-  OVERVIEW_SECTORS.forEach((sector, index) => {
+  OVERVIEW_SECTORS.forEach(sector => {
     const targetRow = rowForScene(sector.sceneId);
-    const targetMeta = sceneAutoLotMeta(targetRow);
-    if (!targetMeta) return;
+    if (!targetRow) return;
 
-    const bearing = bearingDegrees(overviewMeta.lat, overviewMeta.lng, targetMeta.lat, targetMeta.lng);
-    const centerYaw = normalizeYaw(bearing + overviewMeta.headingOffset);
-    const distance = distanceMeters(overviewMeta.lat, overviewMeta.lng, targetMeta.lat, targetMeta.lng);
-    const halfYaw = Math.max(12, Math.min(26, 10 + distance / 80));
-    const centerPitch = toDeg(Math.atan2(-overviewMeta.altitude, Math.max(1, distance))) + overviewMeta.pitchOffset;
-    const topPitch = Math.min(-4, centerPitch + 12);
-    const bottomPitch = Math.max(-68, centerPitch - 24);
+    const centerYaw = normalizeYaw((sector.yawStart + sector.yawEnd) / 2);
     const points = [
-      { yaw: normalizeYaw(centerYaw - halfYaw), pitch: topPitch },
-      { yaw: normalizeYaw(centerYaw + halfYaw), pitch: topPitch },
-      { yaw: normalizeYaw(centerYaw + halfYaw * 0.74), pitch: bottomPitch },
-      { yaw: normalizeYaw(centerYaw - halfYaw * 0.74), pitch: bottomPitch },
+      { yaw: sector.yawStart, pitch: OVERVIEW_SECTOR_TOP_PITCH },
+      { yaw: sector.yawEnd, pitch: OVERVIEW_SECTOR_TOP_PITCH },
+      { yaw: sector.yawEnd, pitch: OVERVIEW_SECTOR_BOTTOM_PITCH },
+      { yaw: sector.yawStart, pitch: OVERVIEW_SECTOR_BOTTOM_PITCH },
     ];
     const screenPoints = points.map(point => projectPoint(point, width, height)).filter(Boolean);
     if (screenPoints.length < 3) return;
@@ -2988,7 +2973,10 @@ function renderOverviewSectors(layer, width, height) {
     });
     layer.appendChild(polygon);
 
-    const labelPoint = projectPoint({ yaw: centerYaw, pitch: (topPitch + bottomPitch) / 2 }, width, height);
+    const labelPoint = projectPoint({
+      yaw: centerYaw,
+      pitch: (OVERVIEW_SECTOR_TOP_PITCH + OVERVIEW_SECTOR_BOTTOM_PITCH) / 2,
+    }, width, height);
     if (!labelPoint) return;
 
     const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -3004,7 +2992,7 @@ function renderOverviewSectors(layer, width, height) {
     label.setAttribute('class', 'sector-label');
     label.setAttribute('x', labelPoint.x.toFixed(1));
     label.setAttribute('y', labelPoint.y.toFixed(1));
-    label.textContent = sector.title || `Сектор ${index + 1}`;
+    label.textContent = sector.title;
     layer.appendChild(label);
   });
 }
@@ -3025,6 +3013,11 @@ function renderLotPolygons() {
   layer.innerHTML = '';
 
   renderOverviewSectors(layer, width, height);
+  if (currentSceneId === OVERVIEW_SCENE_ID && !isEditorMode) {
+    isLotPolygonHovered = false;
+    hidePolygonTooltip();
+    return;
+  }
 
   if (groupedScene && !group) {
     isLotPolygonHovered = false;
