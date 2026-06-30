@@ -1624,10 +1624,10 @@
      ═══════════════════════════════════════ -->
 <script>
   // 1. Вставьте ID вашей Google Таблицы (из ссылки: docs.google.com/spreadsheets/d/ВОТ_ЭТОТ_ID/edit)
-  const SHEET_ID = '1WsXlSFT3RrpdQq3D7SF8_M2avwaxEgGsMSJ77MjPxGo';
+  const SHEET_ID = '1o8rWwkVEZCIQiUbVbDeWsOOjdoqu9VsqvW29QF_CPek';
 
   // 2. Имя листа (вкладки) в таблице
-  const SHEET_NAME = 'Турыы';
+  const SHEET_NAME = 'Лист1';
 
   // Временный ключ редактора. Для продакшена лучше проверять его на backend.
   const EDITOR_KEY = 'landjer-admin-2026';
@@ -1811,8 +1811,8 @@ const COL = {
   thumbUrl:    'thumb_url',     // ссылка на миниатюру (необязательно)
   hotspotTo:   'hotspot_to',    // ID сцены для перехода (необязательно)
   hotspotText: 'hotspot_text',  // текст точки перехода (необязательно)
-  yaw:         'yaw',           // горизонтальный угол hotspot (необязательно)
-  pitch:       'pitch',         // вертикальный угол hotspot (необязательно)
+  yaw:         'hotspot_yaw',   // горизонтальный угол hotspot (необязательно)
+  pitch:       'hotspot_pitch', // вертикальный угол hotspot (необязательно)
   lotId:       'lot_id',        // ID участка на продажу (необязательно)
   lotStatus:   'lot_status',    // статус участка: available / reserved / sold
   lotArea:     'lot_area',      // площадь участка
@@ -1823,7 +1823,10 @@ const COL = {
   mapUrl:      'map_url',       // ссылка на Google Maps для сцены или объекта
   sceneLat:    'scene_lat',     // широта точки съёмки панорамы для авто-KML участков
   sceneLng:    'scene_lng',     // долгота точки съёмки панорамы для авто-KML участков
-  sceneAltitude:'scene_altitude_m', // высота камеры/дрона над землёй в метрах
+  sceneAltitude:'altitude_m', // высота камеры/дрона над землёй в метрах
+  startYaw:    'start_yaw',     // стартовый горизонтальный угол сцены
+  startPitch:  'start_pitch',   // стартовый вертикальный угол сцены
+  startHfov:   'start_hfov',    // стартовое поле зрения сцены
   headingOffset:'heading_offset', // yaw, где в панораме находится север: yaw = bearing + heading_offset
   pitchOffset: 'pitch_offset',   // тонкая поправка pitch для авто-KML участков
   lotRadiusM:  'lot_radius_m',   // максимальная дистанция участков от точки съёмки
@@ -2027,7 +2030,8 @@ async function fetchSheetData() {
 
 function fetchSheetDataOnce(attempt) {
   const callbackName = `sheetCallback_${Date.now()}_${Math.random().toString(36).slice(2)}`;
-  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&headers=1&tqx=${encodeURIComponent(`out:json;responseHandler:${callbackName}`)}`;
+  const cacheBust = Date.now();
+  const url = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?sheet=${encodeURIComponent(SHEET_NAME)}&headers=1&tqx=${encodeURIComponent(`out:json;responseHandler:${callbackName}`)}&t=${cacheBust}`;
 
   return new Promise((resolve, reject) => {
     const script = document.createElement('script');
@@ -2406,6 +2410,17 @@ function sceneAutoLotMeta(row) {
     pitchOffset: Number.isFinite(pitchOffset) ? pitchOffset : 0,
     radius: Number.isFinite(radius) && radius > 0 ? radius : AUTO_LOT_DEFAULT_RADIUS_M,
   };
+}
+
+function sceneStartViewFromRow(row) {
+  const startYaw = parseNumberValue(row?.[COL.startYaw]);
+  const startPitch = parseNumberValue(row?.[COL.startPitch]);
+  const startHfov = parseNumberValue(row?.[COL.startHfov]);
+  const view = {};
+  if (Number.isFinite(startYaw)) view.yaw = startYaw;
+  if (Number.isFinite(startPitch)) view.pitch = startPitch;
+  if (Number.isFinite(startHfov) && startHfov > 0) view.hfov = startHfov;
+  return view;
 }
 
 function lotFromGeometryFeature(feature, sceneMeta) {
@@ -3240,6 +3255,7 @@ function buildConfig(rows) {
       title: escapeHTML(row[COL.title] || id),
       hotSpots: hotspots,
       ...(SCENE_START_VIEWS[id] || {}),
+      ...sceneStartViewFromRow(row),
     };
   });
 
@@ -3992,7 +4008,10 @@ function startIntroMessages() {
   const introTimer = startIntroMessages();
 
   try {
-    const rows = LOCAL_TOUR_ROWS;
+    const rows = await fetchSheetData().catch(err => {
+      console.warn('Таблица разработчика не загружена, использую локальную копию:', err);
+      return LOCAL_TOUR_ROWS;
+    });
     await loadAutoLotSources();
 
     if (getSceneRows(rows).length === 0) {
