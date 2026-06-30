@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Виртуальный тур</title>
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.css">
-<script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.6/build/pannellum.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.css">
+<script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.js"></script>
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -1827,7 +1827,8 @@ let polygonTooltipHideTimer = null;
 let activeLot = null;
 const activeLotStatuses = new Set(['available', 'reserved', 'sold']);
 const urlParams = new URLSearchParams(location.search);
-const isEditorMode = urlParams.get('mode') === 'editor' && urlParams.get('key') === EDITOR_KEY;
+const isLocalEditorHost = ['localhost', '127.0.0.1', '::1', ''].includes(location.hostname);
+const isEditorMode = isLocalEditorHost && urlParams.get('mode') === 'editor' && urlParams.get('key') === EDITOR_KEY;
 
 document.body.classList.toggle('editor-mode', isEditorMode);
 document.querySelectorAll('.editor-only').forEach(element => {
@@ -2073,6 +2074,31 @@ function escapeHTML(value) {
     '"': '&quot;',
     "'": '&#39;',
   }[ch]));
+}
+
+function safeExternalUrl(value, fallback = '') {
+  const raw = String(value || '').trim();
+  if (!raw) return fallback;
+  try {
+    const url = new URL(raw, location.href);
+    if (['https:', 'http:', 'mailto:', 'tel:'].includes(url.protocol.toLowerCase())) return url.href;
+  } catch (err) {
+    return fallback;
+  }
+  return fallback;
+}
+
+function safeImageUrl(value) {
+  const raw = String(value || '').trim();
+  if (!raw) return '';
+  if (/^data:image\//i.test(raw)) return raw;
+  try {
+    const url = new URL(raw, location.href);
+    if (['https:', 'http:'].includes(url.protocol.toLowerCase())) return url.href;
+  } catch (err) {
+    return '';
+  }
+  return '';
 }
 
 function statusInfo(status) {
@@ -2356,7 +2382,7 @@ function requestUrlForLot(lot) {
   const title = lot?.title || 'участок';
   const text = `Здравствуйте! Интересует ${title}${lot?.area ? `, площадь ${lot.area}` : ''}${lot?.price ? `, цена ${lot.price}` : ''}.`;
   if (CONTACT_WHATSAPP) return `https://wa.me/${CONTACT_WHATSAPP}?text=${encodeURIComponent(text)}`;
-  return lot?.link || REQUEST_URL;
+  return safeExternalUrl(lot?.link, REQUEST_URL);
 }
 
 function openLotCard(lot) {
@@ -2911,7 +2937,7 @@ function buildConfig(rows) {
       sceneMap[id].hotspots.push({
         type: 'scene',
         sceneId: row[COL.hotspotTo],
-        text: row[COL.hotspotText] || row[COL.hotspotTo],
+        text: escapeHTML(row[COL.hotspotText] || row[COL.hotspotTo]),
         yaw: parseFloat(row[COL.yaw]) || 0,
         pitch: parseFloat(row[COL.pitch]) || -10,
       });
@@ -2946,7 +2972,7 @@ function buildConfig(rows) {
     scenes[id] = {
       type: 'equirectangular',
       panorama: normalizeImageUrl(row[COL.imageUrl]),
-      title: row[COL.title] || id,
+      title: escapeHTML(row[COL.title] || id),
       hotSpots: hotspots,
     };
   });
@@ -2998,15 +3024,16 @@ function renderSidebar(rows) {
       card.setAttribute('role', 'listitem');
       card.setAttribute('tabindex', '0');
 
-      const thumb = row[COL.thumbUrl]
-        ? `<img class="scene-thumb" src="${row[COL.thumbUrl]}" alt="" loading="lazy">`
+      const thumbUrl = safeImageUrl(row[COL.thumbUrl]);
+      const thumb = thumbUrl
+        ? `<img class="scene-thumb" src="${escapeHTML(thumbUrl)}" alt="" loading="lazy">`
         : `<div class="scene-thumb-placeholder"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg></div>`;
 
       card.innerHTML = `
         ${thumb}
         <div class="scene-info">
-          <div class="scene-name">${row[COL.title] || row[COL.id]}</div>
-          ${row[COL.description] ? `<div class="scene-desc">${row[COL.description]}</div>` : ''}
+          <div class="scene-name">${escapeHTML(row[COL.title] || row[COL.id])}</div>
+          ${row[COL.description] ? `<div class="scene-desc">${escapeHTML(row[COL.description])}</div>` : ''}
         </div>
         <div class="scene-num">${i + 1}</div>
       `;
@@ -3076,7 +3103,8 @@ function updateSidebarActive(sceneId) {
   document.querySelectorAll('.scene-card').forEach(c => {
     c.classList.toggle('active', c.dataset.sceneId === sceneId);
   });
-  const active = document.querySelector(`.scene-card[data-scene-id="${sceneId}"]`);
+  const active = Array.from(document.querySelectorAll('.scene-card'))
+    .find(card => card.dataset.sceneId === sceneId);
   if (active) active.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
 
   const idx = allScenes.findIndex(r => r[COL.id] === sceneId);
@@ -3243,7 +3271,7 @@ function toggleSidebar() {
 
 function openCurrentMap() {
   const row = allScenes.find(scene => scene[COL.id] === currentSceneId);
-  const url = document.getElementById('mapButton').dataset.mapUrl || mapUrlFromRow(row);
+  const url = safeExternalUrl(document.getElementById('mapButton').dataset.mapUrl || mapUrlFromRow(row), DEFAULT_MAP_URL);
   window.open(url, '_blank', 'noopener');
 }
 
@@ -3660,7 +3688,7 @@ function hideLoading() {
 function showError(msg) {
   document.body.classList.remove('tour-ready');
   document.getElementById('loadingScreen').style.display = 'none';
-  document.getElementById('errorMsg').innerHTML = msg;
+  document.getElementById('errorMsg').textContent = msg;
   document.getElementById('errorScreen').classList.add('show');
 }
 
@@ -3691,14 +3719,7 @@ function startIntroMessages() {
   const introTimer = startIntroMessages();
   if (!SHEET_ID || SHEET_ID === 'ВАШ_ID_ТАБЛИЦЫ_ЗДЕСЬ') {
     if (introTimer) clearInterval(introTimer);
-    showError(`
-      Укажите <strong>SHEET_ID</strong> в начале файла.<br><br>
-      Откройте Google Таблицу и скопируйте ID из ссылки:<br>
-      <code style="font-family:monospace; font-size:11px; background:rgba(255,255,255,0.1); padding:2px 6px; border-radius:4px;">
-        docs.google.com/spreadsheets/d/<strong>ВОТ_ЭТОТ_ID</strong>/edit
-      </code><br><br>
-      Также убедитесь что таблица открыта для просмотра (Поделиться → Все у кого есть ссылка).
-    `);
+    showError('Укажите SHEET_ID в начале файла. Скопируйте ID из ссылки Google Таблицы и убедитесь, что таблица открыта для просмотра по ссылке.');
     return;
   }
 
@@ -3708,7 +3729,7 @@ function startIntroMessages() {
 
     if (getSceneRows(rows).length === 0) {
       if (introTimer) clearInterval(introTimer);
-      showError('Таблица найдена, но сцены не обнаружены.<br>Проверьте что колонки называются правильно (scene_id, image_url).');
+      showError('Таблица найдена, но сцены не обнаружены. Проверьте, что колонки называются правильно: scene_id, image_url.');
       return;
     }
 
@@ -3724,17 +3745,7 @@ function startIntroMessages() {
   } catch (err) {
     if (introTimer) clearInterval(introTimer);
     console.error(err);
-    showError(`
-      Ошибка загрузки тура.<br><br>
-      <strong>Причины:</strong><br>
-      • Таблица не открыта для публичного доступа<br>
-      • Неверный SHEET_ID или имя листа<br>
-      • Google Таблица отвечает слишком медленно, попробуйте обновить страницу<br>
-      • В image_url указано имя файла вместо полной ссылки на панораму<br>
-      • Файл панорамы на Google Drive еще загружается или временно недоступен<br>
-      • Нет подключения к интернету<br><br>
-      <small style="opacity:.6">${err.message}</small>
-    `);
+    showError(`Ошибка загрузки тура. Возможные причины: таблица не открыта для публичного доступа, неверный SHEET_ID или имя листа, Google Таблица отвечает слишком медленно, в image_url указано имя файла вместо полной ссылки, панорама временно недоступна или нет подключения к интернету. Детали: ${err.message}`);
   }
 })();
 </script>
