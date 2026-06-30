@@ -1832,6 +1832,10 @@ const COL = {
   lotRadiusM:  'lot_radius_m',   // максимальная дистанция участков от точки съёмки
   lotDisplayMode:'lot_display_mode', // groups = сначала показывать группы, а не все участки
   lotGroupSize:'lot_group_size', // примерное количество участков в одной группе
+  sectorId:    'sector_id',      // ID сектора на обзорной панораме
+  sectorTitle: 'sector_title',   // название сектора
+  sectorTo:    'sector_to_scene_id', // ID панорамы, куда ведёт сектор
+  sectorPoints:'sector_points',  // границы сектора: yaw,pitch; yaw,pitch; yaw,pitch
 };
 
 const LOCAL_TOUR_ROWS = [
@@ -1969,23 +1973,14 @@ const LOT_GEOMETRY_URL = 'data/lots.geojson';
 const AUTO_LOT_DEFAULT_RADIUS_M = 1400;
 const LOT_GROUP_DEFAULT_SIZE = 20;
 const ENABLE_AUTO_LOTS = false;
-const ENABLE_OVERVIEW_SECTORS = false;
-const OVERVIEW_SCENE_ID = 'karajar-20260630-1';
+const ENABLE_OVERVIEW_SECTORS = true;
+const OVERVIEW_SCENE_ID = 'karajar-20260630-7';
 const SCENE_START_VIEWS = {
   [OVERVIEW_SCENE_ID]: { yaw: 0, pitch: -35, hfov: 120 },
 };
-const OVERVIEW_SECTORS = [
-  { title: 'Сектор 1', sceneId: 'karajar-20260630-2', yawStart: -60, yawEnd: -40 },
-  { title: 'Сектор 2', sceneId: 'karajar-20260630-3', yawStart: -40, yawEnd: -20 },
-  { title: 'Сектор 3', sceneId: 'karajar-20260630-4', yawStart: -20, yawEnd: 0 },
-  { title: 'Сектор 4', sceneId: 'karajar-20260630-5', yawStart: 0, yawEnd: 20 },
-  { title: 'Сектор 5', sceneId: 'karajar-20260630-6', yawStart: 20, yawEnd: 40 },
-  { title: 'Сектор 6', sceneId: 'karajar-20260630-8', yawStart: 40, yawEnd: 60 },
-];
-const OVERVIEW_SECTOR_TOP_PITCH = -12;
-const OVERVIEW_SECTOR_BOTTOM_PITCH = -68;
 let lotPolygonsByScene = {};
 let lotGroupsByScene = {};
+let overviewSectorsByScene = {};
 let sceneLotDisplayModes = {};
 let activeLotGroupByScene = {};
 let lotBusinessById = new Map();
@@ -2205,7 +2200,7 @@ function parseCSV(text) {
 }
 
 function isUsableRow(row) {
-  return row[COL.id] && (row[COL.imageUrl] || row[COL.hotspotTo] || row[COL.lotId]);
+  return row[COL.id] && (row[COL.imageUrl] || row[COL.hotspotTo] || row[COL.lotId] || row[COL.sectorId]);
 }
 
 function getSceneRows(rows) {
@@ -2982,18 +2977,12 @@ function renderOverviewSectors(layer, width, height) {
   if (!ENABLE_OVERVIEW_SECTORS) return;
   if (currentSceneId !== OVERVIEW_SCENE_ID) return;
 
-  OVERVIEW_SECTORS.forEach(sector => {
+  const sectors = overviewSectorsByScene[currentSceneId] || [];
+  sectors.forEach(sector => {
     const targetRow = rowForScene(sector.sceneId);
     if (!targetRow) return;
 
-    const centerYaw = normalizeYaw((sector.yawStart + sector.yawEnd) / 2);
-    const points = [
-      { yaw: sector.yawStart, pitch: OVERVIEW_SECTOR_TOP_PITCH },
-      { yaw: sector.yawEnd, pitch: OVERVIEW_SECTOR_TOP_PITCH },
-      { yaw: sector.yawEnd, pitch: OVERVIEW_SECTOR_BOTTOM_PITCH },
-      { yaw: sector.yawStart, pitch: OVERVIEW_SECTOR_BOTTOM_PITCH },
-    ];
-    const screenPoints = points.map(point => projectPoint(point, width, height)).filter(Boolean);
+    const screenPoints = sector.points.map(point => projectPoint(point, width, height)).filter(Boolean);
     if (screenPoints.length < 3) return;
 
     const polygon = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
@@ -3008,10 +2997,7 @@ function renderOverviewSectors(layer, width, height) {
     });
     layer.appendChild(polygon);
 
-    const labelPoint = projectPoint({
-      yaw: centerYaw,
-      pitch: (OVERVIEW_SECTOR_TOP_PITCH + OVERVIEW_SECTOR_BOTTOM_PITCH) / 2,
-    }, width, height);
+    const labelPoint = projectPoint(polygonYawPitchCenter(sector.points), width, height);
     if (!labelPoint) return;
 
     const labelBg = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
@@ -3201,6 +3187,7 @@ function buildConfig(rows) {
   const sceneOrder = sceneRows.map(row => row[COL.id]);
   lotPolygonsByScene = {};
   lotGroupsByScene = {};
+  overviewSectorsByScene = {};
   sceneLotDisplayModes = {};
 
   const sceneMap = {};
@@ -3221,6 +3208,18 @@ function buildConfig(rows) {
         yaw: parseFloat(row[COL.yaw]) || 0,
         pitch: parseFloat(row[COL.pitch]) || -10,
       });
+    }
+    if (row[COL.sectorId]) {
+      const sectorPoints = parseLotPoints(row[COL.sectorPoints]);
+      if (sectorPoints.length >= 3) {
+        if (!overviewSectorsByScene[id]) overviewSectorsByScene[id] = [];
+        overviewSectorsByScene[id].push({
+          id: row[COL.sectorId],
+          title: row[COL.sectorTitle] || row[COL.sectorId],
+          sceneId: row[COL.sectorTo],
+          points: sectorPoints,
+        });
+      }
     }
     if (row[COL.lotId]) {
       const lotPoints = parseLotPoints(row[COL.lotPoints]);
