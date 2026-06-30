@@ -966,6 +966,44 @@
     height: 20px;
   }
 
+  .back-overview-button {
+    position: absolute;
+    left: 18px;
+    top: 108px;
+    min-height: 44px;
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 999px;
+    background: rgba(255,255,255,0.92);
+    color: var(--brand-green-deep);
+    padding: 0 16px 0 13px;
+    display: none;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 800;
+    box-shadow: 0 14px 34px rgba(16,35,22,0.22);
+    backdrop-filter: blur(12px);
+    cursor: pointer;
+    z-index: 90;
+    transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+  }
+  .back-overview-button.is-visible {
+    display: inline-flex;
+  }
+  .back-overview-button:hover,
+  .back-overview-button:focus {
+    background: var(--brand-green);
+    color: white;
+    border-color: rgba(255,255,255,0.34);
+    transform: translateY(-2px);
+    outline: none;
+  }
+  .back-overview-button svg {
+    width: 18px;
+    height: 18px;
+    pointer-events: none;
+  }
+
   .mobile-actions {
     display: none;
   }
@@ -1145,6 +1183,16 @@
     #btnFullscreen { display: none; }
     .sidebar-brand img { height: 72px; }
     .counter-badge { top: 82px; right: 12px; }
+    .back-overview-button {
+      top: 82px;
+      left: 12px;
+      min-height: 42px;
+      padding: 0 13px 0 11px;
+      z-index: 260;
+    }
+    .back-overview-button span {
+      display: none;
+    }
     .coords-badge {
       top: 82px;
       left: 12px;
@@ -1750,6 +1798,14 @@
       </svg>
     </button>
 
+    <button class="back-overview-button" id="backToOverviewButton" type="button" title="Вернуться к панораме 400м" aria-label="Вернуться к панораме 400м">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M19 12H5"/>
+        <path d="M12 19l-7-7 7-7"/>
+      </svg>
+      <span>Назад к 400м</span>
+    </button>
+
     <!-- Mobile actions -->
     <div class="mobile-actions" aria-label="Основные действия">
       <button class="mobile-action map-only" id="mobileMapButton" type="button" title="Карта" aria-label="Открыть карту">
@@ -1962,6 +2018,7 @@ const LOCAL_TOUR_ROWS = [
 let viewer = null;
 let allScenes = [];
 let currentSceneId = null;
+let lastHighAltitudeSceneId = 'karajar-20260630-7';
 let tourConfig = null;
 const preloadedPanoramaUrls = new Set();
 const preloadingPanoramaUrls = new Set();
@@ -1976,6 +2033,7 @@ const LOT_GROUP_DEFAULT_SIZE = 20;
 const ENABLE_AUTO_LOTS = true;
 const ENABLE_LOT_GROUPS = false;
 const ENABLE_OVERVIEW_SECTORS = true;
+const START_SCENE_ID = 'karajar-20260630-7';
 const OVERVIEW_SCENE_ID = 'karajar-20260630-7';
 const SCENE_START_VIEWS = {
   [OVERVIEW_SCENE_ID]: { yaw: 0, pitch: -35, hfov: 120 },
@@ -3333,7 +3391,7 @@ function buildConfig(rows) {
 
   return {
     default: {
-      firstScene: sceneOrder[0],
+      firstScene: initialSceneId(sceneOrder),
       sceneFadeDuration: 1000,
       autoLoad: true,
       showControls: true,
@@ -3452,12 +3510,15 @@ document.querySelectorAll('[data-status-filter]').forEach(button => {
 // Загрузка сцены
 function loadScene(sceneId) {
   if (!viewer || currentSceneId === sceneId) return;
+  const previousSceneId = currentSceneId;
+  rememberReturnScene(previousSceneId, sceneId);
   hidePolygonTooltip();
   closeLotCard();
   viewer.loadScene(sceneId);
   currentSceneId = sceneId;
   updateSidebarActive(sceneId);
   updateOverlay(sceneId);
+  updateBackToOverviewButton(sceneId);
   renderLotGroupPanel();
   renderLotPolygons();
   updateSavedPolygonsList();
@@ -3492,6 +3553,39 @@ function updateMapButton(row) {
   const btn = document.getElementById('mapButton');
   if (!btn) return;
   btn.dataset.mapUrl = mapUrlFromRow(row);
+}
+
+function isHighAltitudeScene(sceneId) {
+  const row = rowForScene(sceneId);
+  const altitude = parseNumberValue(row?.[COL.sceneAltitude]);
+  return Number.isFinite(altitude) && altitude >= 350;
+}
+
+function initialSceneId(sceneOrder) {
+  return sceneOrder.includes(START_SCENE_ID) ? START_SCENE_ID : sceneOrder[0];
+}
+
+function returnSceneId() {
+  if (tourConfig?.scenes?.[lastHighAltitudeSceneId]) return lastHighAltitudeSceneId;
+  if (tourConfig?.scenes?.[START_SCENE_ID]) return START_SCENE_ID;
+  const firstHighScene = allScenes.find(row => isHighAltitudeScene(row[COL.id]));
+  return firstHighScene?.[COL.id] || allScenes[0]?.[COL.id] || '';
+}
+
+function rememberReturnScene(previousSceneId, nextSceneId) {
+  if (isHighAltitudeScene(previousSceneId) && !isHighAltitudeScene(nextSceneId)) {
+    lastHighAltitudeSceneId = previousSceneId;
+  }
+  if (isHighAltitudeScene(nextSceneId)) {
+    lastHighAltitudeSceneId = nextSceneId;
+  }
+}
+
+function updateBackToOverviewButton(sceneId) {
+  const btn = document.getElementById('backToOverviewButton');
+  if (!btn) return;
+  const shouldShow = Boolean(sceneId && !isHighAltitudeScene(sceneId) && returnSceneId());
+  btn.classList.toggle('is-visible', shouldShow);
 }
 
 function getScenePanoramaUrl(sceneId) {
@@ -3560,8 +3654,10 @@ function initViewer(config, onFirstLoad) {
 
   const firstId = config.default.firstScene;
   currentSceneId = firstId;
+  rememberReturnScene(null, firstId);
   updateSidebarActive(firstId);
   updateOverlay(firstId);
+  updateBackToOverviewButton(firstId);
   renderLotGroupPanel();
   startPolygonRenderer();
   updateSavedPolygonsList();
@@ -3575,11 +3671,14 @@ function initViewer(config, onFirstLoad) {
   });
 
   viewer.on('scenechange', id => {
+    const previousSceneId = currentSceneId;
+    rememberReturnScene(previousSceneId, id);
     hidePolygonTooltip();
     closeLotCard();
     currentSceneId = id;
     updateSidebarActive(id);
     updateOverlay(id);
+    updateBackToOverviewButton(id);
     renderLotGroupPanel();
     renderLotPolygons();
     updateSavedPolygonsList();
@@ -3749,6 +3848,11 @@ onActivate(document.getElementById('btnFullscreen'), () => {
 onActivate(document.getElementById('sidebarToggle'), toggleSidebar);
 
 onActivate(document.getElementById('mapButton'), openCurrentMap);
+
+onActivate(document.getElementById('backToOverviewButton'), () => {
+  const targetSceneId = returnSceneId();
+  if (targetSceneId) loadScene(targetSceneId);
+});
 
 onActivate(document.getElementById('mobileMenuButton'), toggleSidebar);
 
