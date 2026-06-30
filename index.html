@@ -1963,6 +1963,8 @@ const CLIENT_LOTS_GID = '2123234659';
 const LOT_GEOMETRY_URL = 'data/lots.geojson';
 const AUTO_LOT_DEFAULT_RADIUS_M = 1400;
 const LOT_GROUP_DEFAULT_SIZE = 20;
+const ENABLE_AUTO_LOTS = false;
+const ENABLE_OVERVIEW_SECTORS = false;
 const OVERVIEW_SCENE_ID = 'karajar-20260630-1';
 const SCENE_START_VIEWS = {
   [OVERVIEW_SCENE_ID]: { yaw: 0, pitch: -35, hfov: 120 },
@@ -2079,6 +2081,12 @@ function parseSheetResponse(data) {
 }
 
 async function loadAutoLotSources() {
+  if (!ENABLE_AUTO_LOTS) {
+    lotBusinessById = new Map();
+    lotGeometryFeatures = [];
+    return;
+  }
+
   const [clientLots, geometry] = await Promise.all([
     fetchClientLotsData().catch(err => {
       console.warn('Клиентская таблица участков не загружена:', err);
@@ -2288,6 +2296,7 @@ function lotDisplayMode(row) {
 }
 
 function sceneUsesLotGroups(sceneId) {
+  if (!ENABLE_AUTO_LOTS) return false;
   if (sceneId === OVERVIEW_SCENE_ID) return false;
   return sceneLotDisplayModes[sceneId] === 'groups';
 }
@@ -2440,6 +2449,7 @@ function lotFromGeometryFeature(feature, sceneMeta) {
 }
 
 function buildAutoLotPolygons(sceneRows) {
+  if (!ENABLE_AUTO_LOTS) return;
   if (!lotBusinessById.size || !lotGeometryFeatures.length) return;
 
   sceneRows.forEach(row => {
@@ -2608,6 +2618,7 @@ function closeLotCard() {
 }
 
 function lotsForCurrentRender(sceneId = currentSceneId) {
+  if (!ENABLE_AUTO_LOTS) return [];
   if (!sceneId) return [];
   if (sceneId === OVERVIEW_SCENE_ID) return [];
   const allLots = lotPolygonsByScene[sceneId] || [];
@@ -2637,6 +2648,12 @@ function closeLotGroup() {
 function renderLotGroupPanel() {
   const panel = document.getElementById('lotGroupPanel');
   if (!panel) return;
+
+  if (!ENABLE_AUTO_LOTS) {
+    panel.classList.remove('open');
+    panel.innerHTML = '';
+    return;
+  }
 
   if (currentSceneId === OVERVIEW_SCENE_ID) {
     panel.classList.remove('open');
@@ -2945,6 +2962,7 @@ function rowForScene(sceneId) {
 }
 
 function renderOverviewSectors(layer, width, height) {
+  if (!ENABLE_OVERVIEW_SECTORS) return;
   if (currentSceneId !== OVERVIEW_SCENE_ID) return;
 
   OVERVIEW_SECTORS.forEach(sector => {
@@ -3011,6 +3029,12 @@ function renderLotPolygons() {
   let hoveredLotPoints = null;
   layer.setAttribute('viewBox', `0 0 ${width} ${height}`);
   layer.innerHTML = '';
+
+  if (!ENABLE_AUTO_LOTS && !ENABLE_OVERVIEW_SECTORS && !isEditorMode) {
+    isLotPolygonHovered = false;
+    hidePolygonTooltip();
+    return;
+  }
 
   renderOverviewSectors(layer, width, height);
   if (currentSceneId === OVERVIEW_SCENE_ID && !isEditorMode) {
@@ -3286,6 +3310,13 @@ function renderSidebar(rows) {
 }
 
 function renderLotStats(rows) {
+  const tools = document.getElementById('lotTools');
+  if (!ENABLE_AUTO_LOTS) {
+    if (tools) tools.style.display = 'none';
+    return;
+  }
+  if (tools) tools.style.display = '';
+
   const stats = { available: 0, reserved: 0, sold: 0 };
   if (lotBusinessById.size) {
     lotBusinessById.forEach(lot => {
