@@ -2050,6 +2050,10 @@ const SCENE_CALIBRATION_OVERRIDES = {
   // Sector / panorama 5: adjusted from two current-to-target panorama points.
   'karajar-20260630-3': { headingOffset: -106.26, pitchOffset: 1.92 },
 };
+const SECTOR_SCENE_OVERRIDES = {
+  'sector-5': 'karajar-20260630-6',
+  'sector-6': 'karajar-20260630-3',
+};
 const EXCLUDED_LOTS_BY_SCENE = {
   // Sector / panorama 4: remove oversized wrong lot #94.
   'karajar-20260630-8': new Set(['010110702296']),
@@ -2555,7 +2559,7 @@ function sceneIdForLotSector(feature, sectorSceneById) {
 
   const props = sector.properties || {};
   const sectorId = String(props.sector_id || props.id || '').trim();
-  return sectorSceneById.get(sectorId) || String(props.scene_id || '').trim();
+  return SECTOR_SCENE_OVERRIDES[sectorId] || sectorSceneById.get(sectorId) || String(props.scene_id || '').trim();
 }
 
 function lotFromGeometryFeature(feature, sceneMeta, options = {}) {
@@ -3377,7 +3381,7 @@ function buildConfig(rows) {
         overviewSectorsByScene[id].push({
           id: row[COL.sectorId],
           title: row[COL.sectorTitle] || row[COL.sectorId],
-          sceneId: row[COL.sectorTo],
+          sceneId: SECTOR_SCENE_OVERRIDES[row[COL.sectorId]] || row[COL.sectorTo],
           points: sectorPoints,
         });
       }

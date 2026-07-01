@@ -158,7 +158,7 @@
       "properties": {
         "sector_id": "sector-5",
         "sector_title": "Сектор 5",
-        "scene_id": "karajar-20260630-3",
+        "scene_id": "karajar-20260630-6",
         "source_name": "sector5",
         "source": "with sectors.kml"
       },
@@ -203,7 +203,7 @@
       "properties": {
         "sector_id": "sector-6",
         "sector_title": "Сектор 6",
-        "scene_id": "karajar-20260630-6",
+        "scene_id": "karajar-20260630-3",
         "source_name": "sector6",
         "source": "with sectors.kml"
       },
