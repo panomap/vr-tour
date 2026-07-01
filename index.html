@@ -1129,10 +1129,10 @@
   .topbar-search-lot {
     display: flex;
     align-items: center;
-    background: rgba(255,255,255,0.88);
-    border: 1px solid rgba(33,58,33,0.16);
+    background: transparent;
+    border: none;
     border-radius: 999px;
-    padding: 2px;
+    padding: 0;
     gap: 0;
     height: 40px;
     width: 40px;
@@ -1141,23 +1141,24 @@
     flex: 0 0 40px;
     overflow: hidden;
     transition: all 0.2s ease;
-    box-shadow: 0 10px 28px rgba(16,35,22,0.08);
+    box-shadow: none;
   }
   .topbar-search-lot.expanded {
-    border-color: var(--accent);
+    border: 1px solid rgba(33,58,33,0.16);
     background: rgba(255,255,255,0.9);
     box-shadow: 0 0 0 3px rgba(81,135,70,0.18);
     gap: 8px;
+    height: 40px;
     width: min(360px, calc(100vw - 118px));
     max-width: min(360px, calc(100vw - 118px));
     flex-basis: min(360px, calc(100vw - 118px));
-    padding-left: 4px;
+    padding: 0 4px 0 0;
   }
   .btn-search-lot {
-    width: 34px;
-    min-width: 34px;
-    height: 34px;
-    border: none;
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    border: 1px solid var(--accent);
     border-radius: 50%;
     background: var(--accent);
     color: white;
@@ -1170,7 +1171,8 @@
   }
   .btn-search-lot:hover {
     background: var(--accent-hover);
-    transform: scale(1.03);
+    border-color: var(--accent-hover);
+    transform: translateY(-1px);
   }
   .btn-search-lot svg {
     width: 16px;
@@ -1485,22 +1487,23 @@
         inset 0 0 42px rgba(255,255,255,0.52);
     }
     .topbar-search-lot {
-      height: 36px;
-      width: 36px;
-      min-width: 36px;
-      max-width: 36px;
-      flex-basis: 36px;
+      height: 40px;
+      width: 40px;
+      min-width: 40px;
+      max-width: 40px;
+      flex-basis: 40px;
     }
     .topbar-search-lot.expanded {
       gap: 4px;
+      height: 40px;
       width: min(278px, calc(100vw - 72px));
       max-width: min(278px, calc(100vw - 72px));
       flex-basis: min(278px, calc(100vw - 72px));
     }
     .btn-search-lot {
-      width: 30px;
-      min-width: 30px;
-      height: 30px;
+      width: 40px;
+      min-width: 40px;
+      height: 40px;
     }
     .topbar-search-lot input {
       font-size: 13px;
@@ -1945,7 +1948,7 @@
           <path d="M15 6v15"/>
         </svg>
       </button>
-      <button class="mobile-action primary" id="mobileRequestButton" type="button">Заявка</button>
+      <button class="mobile-action primary" id="mobileRequestButton" type="button">Связаться</button>
     </div>
 
     <!-- Custom Polygon Tooltip -->
@@ -2903,7 +2906,7 @@ function openLotCard(lot) {
       </div>
       ${lot.text ? `<div class="lot-card-text">${escapeHTML(lot.text)}</div>` : ''}
       <div class="lot-card-actions">
-        <a class="lot-action primary" href="${escapeHTML(requestUrl)}" target="_blank" rel="noopener">Оставить заявку</a>
+        <a class="lot-action primary" href="${escapeHTML(requestUrl)}" target="_blank" rel="noopener">Связаться</a>
         <button class="lot-action" id="lotCardFocus" type="button">Показать</button>
       </div>
     </div>
