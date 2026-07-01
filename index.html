@@ -1145,6 +1145,65 @@
     border: none;
   }
 
+  .topbar-search-lot {
+    display: flex;
+    align-items: center;
+    background: rgba(81,135,70,0.08);
+    border: 1px solid rgba(33,58,33,0.18);
+    border-radius: 999px;
+    padding: 2px 4px 2px 14px;
+    gap: 8px;
+    height: 40px;
+    transition: all 0.2s ease;
+  }
+  .topbar-search-lot:focus-within {
+    border-color: var(--accent);
+    background: rgba(255,255,255,0.9);
+    box-shadow: 0 0 0 3px rgba(81,135,70,0.18);
+  }
+  .topbar-search-lot input {
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text-primary);
+    width: 86px;
+    transition: width 0.2s ease;
+  }
+  .topbar-search-lot input:focus {
+    width: 110px;
+  }
+  .topbar-search-lot input::placeholder {
+    color: var(--text-muted);
+  }
+  .btn-goto-lot {
+    border: none;
+    background: var(--brand-green);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 0 12px;
+    height: 32px;
+    border-radius: 999px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    animation: fadeInScale 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .btn-goto-lot:hover {
+    background: var(--accent-hover);
+    transform: scale(1.02);
+  }
+  @keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.85); }
+    to { opacity: 1; transform: scale(1); }
+  }
+
   /* ── MOBILE ── */
   @media (max-width: 768px) {
     :root { --sidebar-w: 260px; }
@@ -1406,6 +1465,23 @@
       box-shadow:
         0 0 0 16px rgba(81,135,70,0.035),
         inset 0 0 42px rgba(255,255,255,0.52);
+    }
+    .topbar-search-lot {
+      height: 36px;
+      padding: 2px 2px 2px 10px;
+      gap: 4px;
+    }
+    .topbar-search-lot input {
+      font-size: 13px;
+      width: 70px;
+    }
+    .topbar-search-lot input:focus {
+      width: 80px;
+    }
+    .btn-goto-lot {
+      padding: 0 8px;
+      height: 30px;
+      font-size: 10px;
     }
   }
 
@@ -1717,6 +1793,11 @@
   <div class="topbar-title" id="topbarTitle">LANDJER</div>
   <div class="topbar-actions">
     <button class="btn-request" id="topRequestButton" type="button">Оставить заявку</button>
+    <!-- Поиск участка -->
+    <div class="topbar-search-lot" id="topbarSearchLot">
+      <input type="text" id="lotSearchInput" placeholder="№ участка..." autocomplete="off">
+      <button id="btnGoToLot" class="btn-goto-lot" style="display: none;" type="button">Перейти</button>
+    </div>
     <button class="btn-icon btn-sidebar-toggle" id="sidebarToggle" title="Открыть меню" aria-label="Открыть список сцен">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
     </button>
@@ -3506,7 +3587,7 @@ function buildConfig(rows) {
       showControls: true,
       crossOrigin: 'anonymous',
       hfov: 100,
-      minHfov: 50,
+      minHfov: 12,
       maxHfov: 120,
       hotSpotDebug: new URLSearchParams(location.search).has('debug'),
     },
@@ -3929,7 +4010,7 @@ function onSectorActivate(element, handler) {
     event.stopPropagation();
     if (!viewer) return;
     const currentHfov = viewer.getHfov();
-    const nextHfov = Math.max(50, Math.min(120, currentHfov + event.deltaY * 0.16));
+    const nextHfov = Math.max(12, Math.min(120, currentHfov + event.deltaY * 0.16));
     viewer.setHfov(nextHfov, 0);
   }, { passive: false });
 
@@ -4395,6 +4476,107 @@ function startIntroMessages() {
     }, 350);
   }, 1800);
 }
+
+// Поиск и переход к участку
+(function initLotSearch() {
+  const input = document.getElementById('lotSearchInput');
+  const btn = document.getElementById('btnGoToLot');
+  if (!input || !btn) return;
+
+  let foundTarget = null;
+
+  function findLotByKey(key) {
+    const query = String(key).trim().toLowerCase();
+    if (!query) return null;
+    for (const [sceneId, lots] of Object.entries(lotPolygonsByScene)) {
+      const lot = lots.find(l => {
+        const t = String(l.title || '').trim().toLowerCase();
+        const i = String(l.id || '').trim().toLowerCase();
+        const d = String(l.displayNumber || '').trim().toLowerCase();
+        return t === query || i === query || d === query;
+      });
+      if (lot) {
+        return { sceneId, lot };
+      }
+    }
+    // Если точного совпадения нет, ищем частичное
+    for (const [sceneId, lots] of Object.entries(lotPolygonsByScene)) {
+      const lot = lots.find(l => {
+        const t = String(l.title || '').trim().toLowerCase();
+        const i = String(l.id || '').trim().toLowerCase();
+        const d = String(l.displayNumber || '').trim().toLowerCase();
+        return t.includes(query) || i.includes(query) || d.includes(query);
+      });
+      if (lot) {
+        return { sceneId, lot };
+      }
+    }
+    return null;
+  }
+
+  input.addEventListener('input', () => {
+    const query = input.value.trim();
+    foundTarget = findLotByKey(query);
+    if (foundTarget) {
+      btn.style.display = 'inline-flex';
+    } else {
+      btn.style.display = 'none';
+    }
+  });
+
+  input.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' && foundTarget) {
+      goToFoundLot();
+    }
+  });
+
+  onActivate(btn, goToFoundLot);
+
+  function goToFoundLot() {
+    if (!foundTarget || !viewer) return;
+    const { sceneId, lot } = foundTarget;
+
+    const points = lot.points;
+    if (!points || !points.length) return;
+
+    const avgYaw = points.reduce((sum, p) => sum + p.yaw, 0) / points.length;
+    const avgPitch = points.reduce((sum, p) => sum + p.pitch, 0) / points.length;
+    const targetHfov = Math.min(viewer.getHfov(), 86);
+
+    // Ищем группу, к которой принадлежит участок
+    const groups = lotGroupsByScene[sceneId] || [];
+    const matchingGroup = groups.find(g => g.lots.some(l => l.id === lot.id || l.title === lot.title));
+
+    if (currentSceneId === sceneId) {
+      if (matchingGroup) {
+        openLotGroup(matchingGroup.id);
+      }
+      viewer.lookAt(avgPitch, avgYaw, targetHfov, 900);
+      openLotCard(lot);
+    } else {
+      if (matchingGroup) {
+        activeLotGroupByScene[sceneId] = matchingGroup.id;
+      }
+      rememberReturnScene(currentSceneId, sceneId);
+      hidePolygonTooltip();
+      closeLotCard();
+      viewer.loadScene(sceneId, avgPitch, avgYaw, targetHfov);
+      currentSceneId = sceneId;
+      updateSidebarActive(sceneId);
+      updateOverlay(sceneId);
+      updateBackToOverviewButton(sceneId);
+      renderLotGroupPanel();
+      renderLotPolygons();
+      updateSavedPolygonsList();
+      if (isMobileViewport()) setSidebarOpen(false);
+
+      // Открываем карточку участка после загрузки сцены
+      setTimeout(() => {
+        openLotCard(lot);
+      }, 1000);
+    }
+  }
+})();
 
 // ══ СТАРТ ══
 (async function main() {
