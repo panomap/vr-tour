@@ -503,8 +503,9 @@
     transition: fill 0.15s ease, stroke-width 0.15s ease;
   }
   .sector-polygon:hover,
-  .sector-polygon:focus {
-    fill: rgba(81,135,70,0.28);
+  .sector-polygon:focus,
+  .sector-polygon.is-hovered {
+    fill: rgba(81,135,70,0.38);
     stroke-width: 4;
     outline: none;
   }
@@ -2049,7 +2050,7 @@ const SCENE_CALIBRATION_OVERRIDES = {
   // Sector / panorama 5: adjusted from two current-to-target panorama points.
   'karajar-20260630-3': { headingOffset: -106.66, pitchOffset: 1.20 },
   // Sector / panorama 5 after swap: calibrated from two current-to-target panorama points.
-  'karajar-20260630-6': { headingOffset: -143.86, pitchOffset: 0.97 },
+  'karajar-20260630-6': { headingOffset: -145.21, pitchOffset: 0.95 },
 };
 const SECTOR_SCENE_OVERRIDES = {
   'sector-5': 'karajar-20260630-6',
@@ -3809,6 +3810,16 @@ document.addEventListener('pointercancel', endSectorDrag);
 
 function onSectorActivate(element, handler) {
   if (!element) return;
+
+  element.addEventListener('pointerenter', () => {
+    element.classList.add('is-hovered');
+    element.style.fill = 'rgba(81,135,70,0.38)';
+  });
+
+  element.addEventListener('pointerleave', () => {
+    element.classList.remove('is-hovered');
+    element.style.fill = '';
+  });
 
   element.addEventListener('pointerdown', event => {
     beginSectorDrag(event);
