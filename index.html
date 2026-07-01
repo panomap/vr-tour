@@ -3252,7 +3252,7 @@ function projectStableSegments(points, width, height) {
       if (canUse) {
         current.push(projected);
       } else if (current.length >= 2) {
-        segments.push(current);
+        segments.push([current[0], current[current.length - 1]]);
         current = [];
       } else {
         current = [];
@@ -3261,7 +3261,7 @@ function projectStableSegments(points, width, height) {
       previous = canUse ? projected : null;
     }
 
-    if (current.length >= 2) segments.push(current);
+    if (current.length >= 2) segments.push([current[0], current[current.length - 1]]);
   }
 
   return segments;
@@ -3447,9 +3447,12 @@ function renderOverviewSectors(layer, width, height) {
     }
 
     outlineSegments.forEach(segment => {
-      const outline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+      const outline = document.createElementNS('http://www.w3.org/2000/svg', 'line');
       outline.setAttribute('class', 'sector-outline');
-      outline.setAttribute('points', segment.map(point => `${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(' '));
+      outline.setAttribute('x1', segment[0].x.toFixed(1));
+      outline.setAttribute('y1', segment[0].y.toFixed(1));
+      outline.setAttribute('x2', segment[1].x.toFixed(1));
+      outline.setAttribute('y2', segment[1].y.toFixed(1));
       layer.appendChild(outline);
     });
 
