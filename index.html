@@ -2046,6 +2046,10 @@ const SCENE_CALIBRATION_OVERRIDES = {
   // Sector / panorama 3: calibrated from two user-provided KML-to-panorama points.
   'karajar-20260630-5': { headingOffset: 120.40, pitchOffset: 1.33 },
 };
+const EXCLUDED_LOTS_BY_SCENE = {
+  // Sector / panorama 4: remove oversized wrong lot #94.
+  'karajar-20260630-8': new Set(['010110702296']),
+};
 let lotPolygonsByScene = {};
 let lotGroupsByScene = {};
 let overviewSectorsByScene = {};
@@ -2586,6 +2590,10 @@ function lotFromGeometryFeature(feature, sceneMeta, options = {}) {
   };
 }
 
+function isLotExcluded(sceneId, lotId) {
+  return EXCLUDED_LOTS_BY_SCENE[sceneId]?.has(String(lotId || '').trim());
+}
+
 function buildAutoLotPolygons(sceneRows) {
   if (!ENABLE_AUTO_LOTS) return;
   if (!lotGeometryFeatures.length) return;
@@ -2607,14 +2615,18 @@ function buildAutoLotPolygons(sceneRows) {
     const sceneMeta = sceneAutoLotMeta(row);
     if (!sceneMeta) return;
 
-    const autoLots = lotGeometryFeatures
-      .filter(feature => {
-        if (!lotSectorFeatures.length) return sceneId !== OVERVIEW_SCENE_ID;
-        const lotId = String(feature?.properties?.lot_id || feature?.properties?.kad_nomer || '').trim();
-        return lotSceneById.get(lotId) === sceneId;
+    const sceneFeatures = lotGeometryFeatures.filter(feature => {
+      if (!lotSectorFeatures.length) return sceneId !== OVERVIEW_SCENE_ID;
+      const lotId = String(feature?.properties?.lot_id || feature?.properties?.kad_nomer || '').trim();
+      return lotSceneById.get(lotId) === sceneId;
+    });
+    const autoLots = sceneFeatures
+      .map((feature, index) => {
+        const lot = lotFromGeometryFeature(feature, sceneMeta, { ignoreRadius: Boolean(lotSectorFeatures.length) });
+        if (lot) lot.displayNumber = index + 1;
+        return lot;
       })
-      .map(feature => lotFromGeometryFeature(feature, sceneMeta, { ignoreRadius: Boolean(lotSectorFeatures.length) }))
-      .filter(Boolean);
+      .filter(lot => lot && !isLotExcluded(sceneId, lot.id));
     if (!autoLots.length) return;
     if (!lotPolygonsByScene[sceneId]) lotPolygonsByScene[sceneId] = [];
     lotPolygonsByScene[sceneId].push(...autoLots);
@@ -3243,7 +3255,7 @@ function renderLotPolygons() {
     number.setAttribute('class', `lot-number lot-${status.key}`);
     number.setAttribute('x', center.x.toFixed(1));
     number.setAttribute('y', center.y.toFixed(1));
-    number.textContent = String(index + 1);
+    number.textContent = String(lot.displayNumber || index + 1);
     layer.appendChild(number);
   });
 
