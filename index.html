@@ -3219,14 +3219,6 @@ function isStableProjectedSegment(a, b, width, height) {
   return Math.hypot(a.x - b.x, a.y - b.y) <= maxEdge;
 }
 
-function interpolateYawPitch(a, b, t) {
-  const yawDelta = normalizeYaw(b.yaw - a.yaw);
-  return {
-    yaw: normalizeYaw(a.yaw + yawDelta * t),
-    pitch: a.pitch + (b.pitch - a.pitch) * t,
-  };
-}
-
 function projectStablePolygon(points, width, height) {
   const projected = points.map(point => projectPoint(point, width, height));
   if (projected.some(point => !point)) return [];
@@ -3235,33 +3227,14 @@ function projectStablePolygon(points, width, height) {
 }
 
 function projectStableSegments(points, width, height) {
+  const projected = points.map(point => projectPoint(point, width, height));
   const segments = [];
-  const samplesPerEdge = 18;
 
-  for (let i = 0; i < points.length; i++) {
-    const a = points[i];
-    const b = points[(i + 1) % points.length];
-    let current = [];
-    let previous = null;
-
-    for (let step = 0; step <= samplesPerEdge; step++) {
-      const projected = projectPoint(interpolateYawPitch(a, b, step / samplesPerEdge), width, height);
-      const canUse = isProjectedPointNearViewport(projected, width, height)
-        && (!previous || isStableProjectedSegment(previous, projected, width, height));
-
-      if (canUse) {
-        current.push(projected);
-      } else if (current.length >= 2) {
-        segments.push([current[0], current[current.length - 1]]);
-        current = [];
-      } else {
-        current = [];
-      }
-
-      previous = canUse ? projected : null;
-    }
-
-    if (current.length >= 2) segments.push([current[0], current[current.length - 1]]);
+  for (let i = 0; i < projected.length; i++) {
+    const a = projected[i];
+    const b = projected[(i + 1) % projected.length];
+    if (!isStableProjectedSegment(a, b, width, height)) continue;
+    segments.push([a, b]);
   }
 
   return segments;
