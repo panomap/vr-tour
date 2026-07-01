@@ -1191,6 +1191,15 @@
     flex-basis: min(430px, calc(100vw - 118px));
     padding: 0 4px 0 0;
   }
+  .topbar-search-lot.expanded.has-match {
+    border-color: rgba(81,135,70,0.48);
+    background: rgba(255,255,255,0.96);
+    box-shadow: 0 0 0 3px rgba(81,135,70,0.22), 0 12px 28px rgba(16,35,22,0.12);
+  }
+  .topbar-search-lot.expanded.no-match {
+    border-color: rgba(184,107,93,0.42);
+    box-shadow: 0 0 0 3px rgba(184,107,93,0.14);
+  }
   .btn-search-lot {
     width: 40px;
     min-width: 40px;
@@ -1220,8 +1229,9 @@
     border: none;
     background: transparent;
     outline: none;
-    font-size: 13px;
-    font-weight: 500;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    font-size: 15px;
+    font-weight: 800;
     color: var(--text-primary);
     display: none;
     width: auto;
@@ -1235,6 +1245,9 @@
   }
   .topbar-search-lot input::placeholder {
     color: var(--text-muted);
+    font-family: Montserrat, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
   }
   .btn-goto-lot {
     border: none;
@@ -1257,7 +1270,11 @@
   .topbar-search-lot.expanded .btn-goto-lot {
     display: inline-flex;
   }
-  .btn-goto-lot:hover {
+  .btn-goto-lot:not(:disabled) {
+    background: linear-gradient(135deg, var(--brand-green-deep), var(--brand-green));
+    box-shadow: 0 9px 20px rgba(81,135,70,0.34);
+  }
+  .btn-goto-lot:not(:disabled):hover {
     background: var(--accent-hover);
     box-shadow: 0 9px 18px rgba(81,135,70,0.30);
     transform: translateY(-1px);
@@ -1268,6 +1285,11 @@
     box-shadow: none;
     cursor: default;
     transform: none;
+  }
+  .topbar-search-lot.has-match .btn-goto-lot:not(:disabled) {
+    background: var(--brand-green);
+    color: #fff;
+    box-shadow: 0 8px 18px rgba(81,135,70,0.34), 0 0 0 3px rgba(81,135,70,0.16);
   }
   @keyframes fadeInScale {
     from { opacity: 0; transform: scale(0.85); }
@@ -1285,6 +1307,22 @@
       padding: 0 12px;
       gap: 10px;
       z-index: 280;
+    }
+    .topbar-logo {
+      transition: opacity 0.16s ease, transform 0.16s ease, width 0.16s ease;
+    }
+    .topbar.search-open .topbar-logo {
+      width: 0;
+      min-width: 0;
+      opacity: 0;
+      transform: translateX(-8px);
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .topbar.search-open .topbar-actions {
+      width: 100%;
+      margin-left: 0;
+      flex: 1 1 auto;
     }
     .brand-logo-img { width: 92px; height: 46px; }
     .brand-kicker { display: none; }
@@ -1548,6 +1586,11 @@
       width: min(316px, calc(100vw - 72px));
       max-width: min(316px, calc(100vw - 72px));
       flex-basis: min(316px, calc(100vw - 72px));
+    }
+    .topbar.search-open .topbar-search-lot.expanded {
+      width: auto;
+      max-width: none;
+      flex: 1 1 auto;
     }
     .btn-search-lot {
       width: 40px;
@@ -1872,13 +1915,13 @@
   <div class="topbar-title" id="topbarTitle">LANDJER</div>
   <div class="topbar-actions">
     <div class="topbar-search-lot" id="topbarSearchLot">
-      <button class="btn-search-lot" id="btnOpenLotSearch" type="button" title="Поиск по кадастровому номеру" aria-label="Поиск по кадастровому номеру">
+      <button class="btn-search-lot" id="btnOpenLotSearch" type="button" title="Поиск по последним 4 цифрам" aria-label="Открыть поиск по последним 4 цифрам" aria-expanded="false">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
           <circle cx="11" cy="11" r="7"></circle>
           <path d="m20 20-3.5-3.5"></path>
         </svg>
       </button>
-      <input type="search" id="lotSearchInput" placeholder="Кадастровый номер" autocomplete="off" inputmode="search">
+      <input type="text" id="lotSearchInput" placeholder="Последние 4 цифры" autocomplete="off" inputmode="numeric" pattern="[0-9]*" aria-label="Последние 4 цифры кадастрового номера">
       <button id="btnGoToLot" class="btn-goto-lot" type="button" disabled>Перейти</button>
     </div>
     <button class="btn-icon btn-sidebar-toggle" id="sidebarToggle" title="Открыть меню" aria-label="Открыть список сцен">
@@ -4655,69 +4698,85 @@ function startIntroMessages() {
   if (!search || !openBtn || !input || !btn) return;
 
   let foundTarget = null;
+  const requiredDigits = 4;
+  const topbar = search.closest('.topbar');
 
   function setSearchOpen(isOpen) {
     search.classList.toggle('expanded', isOpen);
+    topbar?.classList.toggle('search-open', isOpen);
+    openBtn.setAttribute('aria-expanded', String(isOpen));
     if (isOpen) {
       requestAnimationFrame(() => input.focus());
+    } else {
+      input.blur();
     }
   }
 
-  function findLotByKey(key) {
-    const query = String(key).trim().toLowerCase();
-    if (!query) return null;
+  function digitsOnly(value) {
+    return String(value || '').replace(/\D/g, '');
+  }
+
+  function searchInputDigits(value) {
+    const digits = digitsOnly(value);
+    return digits.length > requiredDigits ? digits.slice(-requiredDigits) : digits;
+  }
+
+  function lotSearchSuffixes(lot) {
+    return [lot.id, lot.title]
+      .map(value => digitsOnly(value))
+      .filter(value => value.length >= requiredDigits)
+      .map(value => value.slice(-requiredDigits));
+  }
+
+  function findLotByLastDigits(key) {
+    const query = searchInputDigits(key);
+    if (query.length !== requiredDigits) return null;
+
     for (const [sceneId, lots] of Object.entries(lotPolygonsByScene)) {
-      const lot = lots.find(l => {
-        const t = String(l.title || '').trim().toLowerCase();
-        const i = String(l.id || '').trim().toLowerCase();
-        const d = String(l.displayNumber || '').trim().toLowerCase();
-        return t === query || i === query || d === query;
-      });
+      const lot = lots.find(l => lotSearchSuffixes(l).includes(query));
       if (lot) {
         return { sceneId, lot };
       }
     }
-    // Если точного совпадения нет, ищем частичное
-    for (const [sceneId, lots] of Object.entries(lotPolygonsByScene)) {
-      const lot = lots.find(l => {
-        const t = String(l.title || '').trim().toLowerCase();
-        const i = String(l.id || '').trim().toLowerCase();
-        const d = String(l.displayNumber || '').trim().toLowerCase();
-        return t.includes(query) || i.includes(query) || d.includes(query);
-      });
-      if (lot) {
-        return { sceneId, lot };
-      }
-    }
+
     return null;
   }
 
+  function updateSearchState() {
+    const query = searchInputDigits(input.value);
+    if (input.value !== query) input.value = query;
+
+    const hasRequiredLength = query.length === requiredDigits;
+    foundTarget = hasRequiredLength ? findLotByLastDigits(query) : null;
+    const hasMatch = Boolean(foundTarget);
+
+    search.classList.toggle('has-digits', query.length > 0);
+    search.classList.toggle('has-four', hasRequiredLength);
+    search.classList.toggle('has-match', hasMatch);
+    search.classList.toggle('no-match', hasRequiredLength && !hasMatch);
+    btn.disabled = !hasMatch;
+    btn.setAttribute('aria-disabled', String(!hasMatch));
+
+    if (!hasMatch) {
+      highlightedLotMatch = null;
+      renderLotPolygons();
+    }
+  }
+
   onActivate(openBtn, () => {
-    setSearchOpen(true);
+    const shouldOpen = !search.classList.contains('expanded');
+    setSearchOpen(shouldOpen);
+    updateSearchState();
   });
 
-  input.addEventListener('input', () => {
-    const query = input.value.trim();
-    foundTarget = findLotByKey(query);
-    if (!query) {
-      highlightedLotMatch = null;
-      renderLotPolygons();
-    }
-    if (foundTarget) {
-      btn.disabled = false;
-    } else {
-      highlightedLotMatch = null;
-      renderLotPolygons();
-      btn.disabled = true;
-    }
-  });
+  input.addEventListener('input', updateSearchState);
 
   input.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       input.value = '';
       foundTarget = null;
       highlightedLotMatch = null;
-      btn.disabled = true;
+      updateSearchState();
       renderLotPolygons();
       setSearchOpen(false);
       openBtn.focus();
@@ -4730,10 +4789,11 @@ function startIntroMessages() {
 
   document.addEventListener('click', (e) => {
     if (search.contains(e.target)) return;
-    if (!input.value.trim()) setSearchOpen(false);
+    if (!searchInputDigits(input.value)) setSearchOpen(false);
   });
 
   onActivate(btn, goToFoundLot);
+  updateSearchState();
 
   function goToFoundLot() {
     if (!foundTarget || !viewer) return;
