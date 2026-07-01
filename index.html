@@ -3205,8 +3205,8 @@ function isStableProjectedPolygon(points, width, height) {
 
 function isProjectedPointNearViewport(point, width, height) {
   if (!point || !Number.isFinite(point.x) || !Number.isFinite(point.y)) return false;
-  const marginX = width * 0.55;
-  const marginY = height * 0.55;
+  const marginX = width * 1.35;
+  const marginY = height * 1.35;
   return point.x >= -marginX
     && point.x <= width + marginX
     && point.y >= -marginY
@@ -3215,7 +3215,7 @@ function isProjectedPointNearViewport(point, width, height) {
 
 function isStableProjectedSegment(a, b, width, height) {
   if (!isProjectedPointNearViewport(a, width, height) || !isProjectedPointNearViewport(b, width, height)) return false;
-  const maxEdge = Math.max(width, height) * 0.82;
+  const maxEdge = Math.max(width, height) * 1.55;
   return Math.hypot(a.x - b.x, a.y - b.y) <= maxEdge;
 }
 
@@ -3410,6 +3410,7 @@ function rowForScene(sceneId) {
 function renderOverviewSectors(layer, width, height) {
   if (!ENABLE_OVERVIEW_SECTORS) return;
   if (currentSceneId !== OVERVIEW_SCENE_ID) return;
+  if (Math.abs(viewer.getPitch()) > 84) return;
 
   const sectors = overviewSectorsByScene[currentSceneId] || [];
   sectors.forEach(sector => {
