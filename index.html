@@ -480,18 +480,25 @@
     pointer-events: auto;
     cursor: pointer;
     fill: rgba(81,135,70,0.03);
-    stroke: rgba(255,255,255,0.92);
-    stroke-width: 2.5;
+    stroke: transparent;
+    stroke-width: 0;
     vector-effect: non-scaling-stroke;
     filter: drop-shadow(0 12px 24px rgba(16,35,22,0.30));
-    transition: fill 0.15s ease, stroke-width 0.15s ease;
+    transition: fill 0.15s ease;
   }
   .sector-polygon:hover,
   .sector-polygon:focus,
   .sector-polygon.is-hovered {
     fill: rgba(81,135,70,0.38);
-    stroke-width: 4;
     outline: none;
+  }
+  .sector-outline {
+    pointer-events: none;
+    fill: none;
+    stroke: rgba(255,255,255,0.92);
+    stroke-width: 2.5;
+    vector-effect: non-scaling-stroke;
+    filter: drop-shadow(0 12px 24px rgba(16,35,22,0.30));
   }
   .sector-label-bg {
     pointer-events: none;
@@ -3125,13 +3132,19 @@ function isStableProjectedPolygon(points, width, height) {
   if (!Array.isArray(points) || points.length < 3) return false;
   if (points.some(point => !Number.isFinite(point.x) || !Number.isFinite(point.y))) return false;
 
+  const marginX = width * 0.28;
+  const marginY = height * 0.28;
+  if (points.some(point => point.x < -marginX || point.x > width + marginX || point.y < -marginY || point.y > height + marginY)) {
+    return false;
+  }
+
   const xs = points.map(point => point.x);
   const ys = points.map(point => point.y);
   const spanX = Math.max(...xs) - Math.min(...xs);
   const spanY = Math.max(...ys) - Math.min(...ys);
-  if (spanX > width * 2.4 || spanY > height * 2.4) return false;
+  if (spanX > width * 1.25 || spanY > height * 1.25) return false;
 
-  const maxEdge = Math.max(width, height) * 1.35;
+  const maxEdge = Math.max(width, height) * 0.82;
   for (let i = 0; i < points.length; i++) {
     const a = points[i];
     const b = points[(i + 1) % points.length];
@@ -3323,6 +3336,11 @@ function renderOverviewSectors(layer, width, height) {
       if (event.key === 'Enter' || event.key === ' ') loadScene(sector.sceneId);
     });
     layer.appendChild(polygon);
+
+    const outline = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+    outline.setAttribute('class', 'sector-outline');
+    outline.setAttribute('points', [...screenPoints, screenPoints[0]].map(point => `${point.x.toFixed(1)},${point.y.toFixed(1)}`).join(' '));
+    layer.appendChild(outline);
 
     const labelPoint = projectPoint(polygonYawPitchCenter(sector.points), width, height);
     if (!labelPoint) return;
