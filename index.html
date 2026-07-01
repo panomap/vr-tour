@@ -2,7 +2,7 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <title>Виртуальный тур</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.css">
 <script src="https://cdn.jsdelivr.net/npm/pannellum@2.5.7/build/pannellum.js"></script>
@@ -38,6 +38,9 @@
     height: 100dvh;
     overflow: hidden;
     -webkit-tap-highlight-color: transparent;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
   }
 
   button,
@@ -1145,7 +1148,15 @@
   /* ── MOBILE ── */
   @media (max-width: 768px) {
     :root { --sidebar-w: 260px; }
-    .topbar { top: 12px; left: 12px; right: 12px; height: 58px; padding: 0 12px; gap: 10px; z-index: 280; }
+    .topbar {
+      top: calc(12px + env(safe-area-inset-top, 0px));
+      left: calc(12px + env(safe-area-inset-left, 0px));
+      right: calc(12px + env(safe-area-inset-right, 0px));
+      height: 58px;
+      padding: 0 12px;
+      gap: 10px;
+      z-index: 280;
+    }
     .brand-logo-img { width: 92px; height: 46px; }
     .brand-kicker { display: none; }
     .viewer-wrap::after {
@@ -1163,13 +1174,16 @@
       pointer-events: auto;
     }
     .sidebar {
-      top: 82px;
-      left: 12px;
+      top: calc(82px + env(safe-area-inset-top, 0px));
+      left: calc(12px + env(safe-area-inset-left, 0px));
       bottom: calc(12px + env(safe-area-inset-bottom, 0px));
-      max-height: calc(100dvh - 94px - env(safe-area-inset-bottom, 0px));
+      max-height: calc(100dvh - 94px - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
       z-index: 270;
     }
     .sidebar.open { transform: translateX(0); box-shadow: 8px 0 24px rgba(0,0,0,0.5); }
+    .sidebar-search input {
+      font-size: 16px; /* Prevents auto-zoom on mobile focus */
+    }
     body.sidebar-open .counter-badge,
     body.sidebar-open .lot-card-panel,
     body.sidebar-open .lot-group-panel,
@@ -1182,10 +1196,13 @@
     .btn-request { display: none; }
     #btnFullscreen { display: none; }
     .sidebar-brand img { height: 72px; }
-    .counter-badge { top: 82px; right: 12px; }
+    .counter-badge {
+      top: calc(82px + env(safe-area-inset-top, 0px));
+      right: calc(12px + env(safe-area-inset-right, 0px));
+    }
     .back-overview-button {
-      top: 82px;
-      left: 12px;
+      top: calc(82px + env(safe-area-inset-top, 0px));
+      left: calc(12px + env(safe-area-inset-left, 0px));
       min-height: 42px;
       padding: 0 13px 0 11px;
       z-index: 260;
@@ -1194,8 +1211,8 @@
       display: none;
     }
     .coords-badge {
-      top: 82px;
-      left: 12px;
+      top: calc(82px + env(safe-area-inset-top, 0px));
+      left: calc(12px + env(safe-area-inset-left, 0px));
       right: auto;
       max-width: calc(100vw - 24px);
       z-index: 260;
@@ -3185,16 +3202,72 @@ function renderOverviewSectors(layer, width, height) {
   });
 }
 
+let lastRenderState = {
+  yaw: null,
+  pitch: null,
+  hfov: null,
+  width: null,
+  height: null,
+  sceneId: null,
+  isDrawingMode: false,
+  drawingPointsStr: '',
+  hoveredLotKey: null,
+  activeGroupId: null,
+};
+
 function renderLotPolygons() {
   if (!viewer || !currentSceneId) return;
   const layer = document.getElementById('lotPolygonLayer');
   const wrap = document.getElementById('panorama');
+  if (!wrap) return;
+
+  const currentYaw = viewer.getYaw();
+  const currentPitch = viewer.getPitch();
+  const currentHfov = viewer.getHfov();
+  const currentWidth = wrap.clientWidth;
+  const currentHeight = wrap.clientHeight;
+  const activeGroup = activeLotGroup(currentSceneId);
+  const activeGroupId = activeGroup ? activeGroup.id : null;
+  const drawingPointsStr = JSON.stringify(currentDrawingPoints);
+
+  const hovered = lotUnderScreenPoint(lastPolygonPointer, currentWidth, currentHeight);
+  const hoveredLotKey = hovered ? (hovered.lot.id || hovered.lot.title) : null;
+
+  const stateChanged =
+    lastRenderState.yaw !== currentYaw ||
+    lastRenderState.pitch !== currentPitch ||
+    lastRenderState.hfov !== currentHfov ||
+    lastRenderState.width !== currentWidth ||
+    lastRenderState.height !== currentHeight ||
+    lastRenderState.sceneId !== currentSceneId ||
+    lastRenderState.isDrawingMode !== isDrawingMode ||
+    lastRenderState.drawingPointsStr !== drawingPointsStr ||
+    lastRenderState.hoveredLotKey !== hoveredLotKey ||
+    lastRenderState.activeGroupId !== activeGroupId;
+
+  if (!stateChanged) {
+    return;
+  }
+
+  lastRenderState = {
+    yaw: currentYaw,
+    pitch: currentPitch,
+    hfov: currentHfov,
+    width: currentWidth,
+    height: currentHeight,
+    sceneId: currentSceneId,
+    isDrawingMode,
+    drawingPointsStr,
+    hoveredLotKey,
+    activeGroupId,
+  };
+
   const tooltip = document.getElementById('polygonTooltip');
   const groupedScene = sceneUsesLotGroups(currentSceneId);
-  const group = activeLotGroup(currentSceneId);
+  const group = activeGroup;
   const lots = lotsForCurrentRender(currentSceneId).filter(visibleLot);
-  const width = wrap.clientWidth;
-  const height = wrap.clientHeight;
+  const width = currentWidth;
+  const height = currentHeight;
   let hoveredLot = null;
   let hoveredLotPoints = null;
   layer.setAttribute('viewBox', `0 0 ${width} ${height}`);
@@ -3733,27 +3806,48 @@ document.getElementById('searchInput').addEventListener('input', function() {
 
 function onActivate(element, handler) {
   if (!element) return;
+  let startX = 0;
+  let startY = 0;
+  let isDragging = false;
   let lastTouchTime = 0;
 
-  function run(event) {
+  element.addEventListener('pointerdown', event => {
+    startX = event.clientX;
+    startY = event.clientY;
+    isDragging = false;
+  }, { passive: true });
+
+  element.addEventListener('pointermove', event => {
+    if (Math.hypot(event.clientX - startX, event.clientY - startY) > 8) {
+      isDragging = true;
+    }
+  }, { passive: true });
+
+  element.addEventListener('pointerup', event => {
+    if (event.pointerType === 'mouse') return;
+    if (isDragging) return;
     lastTouchTime = Date.now();
     event.preventDefault();
     event.stopPropagation();
     handler(event);
-  }
-
-  element.addEventListener('pointerup', event => {
-    if (event.pointerType === 'mouse') return;
-    run(event);
   }, { passive: false });
 
   element.addEventListener('touchend', event => {
     if (Date.now() - lastTouchTime < 450) return;
-    run(event);
+    if (isDragging) return;
+    lastTouchTime = Date.now();
+    event.preventDefault();
+    event.stopPropagation();
+    handler(event);
   }, { passive: false });
 
   element.addEventListener('click', event => {
     if (Date.now() - lastTouchTime < 450) return;
+    if (isDragging) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
     handler(event);
   });
 }
